@@ -1,5 +1,6 @@
 package com.sh.teethdetect;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -89,7 +90,7 @@ public class CariesFragment extends Fragment {
                     startYolo = false;
                 }
 
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType("image/*");
                 intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(intent, CARIES_REQUEST);
@@ -233,7 +234,7 @@ public class CariesFragment extends Fragment {
                             }
                         }
                         Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
-                        Utils.matToBitmap(image1,setimg);
+                         Utils.matToBitmap(image1,setimg);
 
                         if(indlength<=0){
                             datalist.add(new ItemData(setimg,String.valueOf(indlength),visittext));
@@ -251,31 +252,6 @@ public class CariesFragment extends Fragment {
                         RecyclerView.setAdapter(adapter);
                         RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
                     }
-                        /*else {      // 이미지를 여러장 선택한 경우
-                            ClipData clipData = data.getClipData();
-                            Log.e("clipData", String.valueOf(clipData.getItemCount()));
-
-                            if (clipData.getItemCount() > 10) {   // 선택한 이미지가 11장 이상인 경우
-                                Toast.makeText(getApplicationContext(), "사진은 10장까지 선택 가능합니다.", Toast.LENGTH_LONG).show();
-                            }
-                            else {   // 선택한 이미지가 1장 이상 10장 이하인 경우
-                                Log.e(TAG, "multiple choice");
-
-                                for (int i = 0; i < clipData.getItemCount(); i++) {
-                                    Bitmap img = clipData.getItemAt(i).getUri();  // 선택한 이미지들의 uri를 가져온다.
-                                    try {
-                                        bitmap.add(img);  //uri를 list에 담는다.
-
-                                    } catch (Exception e) {
-                                        Log.e(TAG, "File select error", e);
-                                    }
-                                }
-
-                                adapter = new MultiImageAdapter(uriList, getApplicationContext());
-                                RecyclerView.setAdapter(adapter);   // 리사이클러뷰에 어댑터 세팅
-                                RecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));     // 리사이클러뷰 수평 스크롤 적용
-                            }
-                        }*/
                 }
             }
         } catch (Exception e) {}

@@ -13,6 +13,7 @@ public ItemData(Bitmap dataimage, String datainfo, String datadetect) {
     this.datadetect = datadetect;
 }
 
+
 public Bitmap getDataImage() {
     return dataimage;
 }

@@ -552,7 +552,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         new NRPlaces.Builder()
                 .listener(MapsActivity.this)
-                .key("AIzaSyAmgjMwVVaQum7vuiTR5N5JjVEvfFImzrU")
+                .key("AIzaSyAynHN-3YCQHZKIegdqdtDIlOsbD_GSRpg")
                 .latlng(location.latitude, location.longitude)//현재 위치
                 .radius(2000) //2000미터
                 .type(PlaceType.DENTIST) //치과
