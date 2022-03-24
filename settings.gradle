@@ -1,0 +1,3 @@
+rootProject.name = "TeethDetect"
+include ':app'
+include ':openCVLibrary345'
