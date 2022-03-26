@@ -2,8 +2,10 @@ package com.sh.teethdetect;
 
 import android.content.ClipData;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -47,6 +51,9 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -62,6 +69,8 @@ public class CariesFragment extends Fragment {
 
     MultiImageAdapter adapter = new MultiImageAdapter(datalist);
     int indlength=0;
+    String cariesnumber ="";
+    Bitmap myBitmap,bitmap;
     CameraBridgeViewBase cameraBridgeViewBase;
     BaseLoaderCallback baseLoaderCallback;
     boolean startYolo = false;
@@ -72,13 +81,14 @@ public class CariesFragment extends Fragment {
     private ImageView imageView2;
     private Button pictureGet;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View v = inflater.inflate(R.layout.fragment_caries, container, false);
 
-        adapter.notifyDataSetChanged();
+       // adapter.notifyDataSetChanged();
 
         pictureGet = v.findViewById(R.id.pictureGet);
         RecyclerView = v.findViewById(R.id.Recyclerview);
@@ -146,6 +156,7 @@ public class CariesFragment extends Fragment {
         String visittext2= "충치로 의심되는 부분이 있습니다. 치과 방문을 권장합니다.";
         String visittext3= "충치로 의심되는 부분이 너무 많습니다. 빠른 시일내에 치과 방문을 권장합니다.";
 
+
         try {
             if (requestCode == CARIES_REQUEST) {
                 if (data == null) {   // 어떤 이미지도 선택하지 않은 경우
@@ -153,176 +164,177 @@ public class CariesFragment extends Fragment {
                 } else {   // 이미지를 하나라도 선택한 경우
                     if (data.getClipData() == null) {     // 이미지를 하나만 선택한 경우
                         Log.e("single choice: ", String.valueOf(data.getData()));
-                        InputStream in = getActivity().getContentResolver().openInputStream(data.getData());
+
+
+                        /*InputStream in = getActivity().getContentResolver().openInputStream(data.getData());
                         Bitmap img = BitmapFactory.decodeStream(in);
-                        in.close();
+                        in.close();*/
 
-                        Mat image1 = new Mat();
+                        Uri ImageUri = data.getData();
+                        String realuri = getRealPathFromURI(ImageUri);
 
-                        Bitmap copyimg= img.copy(Bitmap.Config.ARGB_8888, true);
-                        Utils.bitmapToMat(copyimg, image1);
-                        Imgproc.cvtColor(image1, image1, Imgproc.COLOR_RGBA2RGB);
+                       // Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), ImageUri);
+                       // String ImageUritoString = BitmapToString(bitmap);
 
-
-                        Mat imageBlob = Dnn.blobFromImage(image1, 0.00392, new Size(416, 416), new Scalar(0, 0, 0));
-
-                        tinyYolo.setInput(imageBlob);
-
-                        java.util.List<Mat> result = new java.util.ArrayList<Mat>(3);
-
-                        List<String> outBlobNames = new java.util.ArrayList<>();
-                        outBlobNames.add(0, "yolo_82");
-                        outBlobNames.add(1, "yolo_94");
-                        outBlobNames.add(2, "yolo_106");
-
-                        tinyYolo.forward(result, outBlobNames);
-
-
-                        float confThreshold = 0.3f;
-
-                        List<Integer> clsIds = new ArrayList<>();
-                        List<Float> confs = new ArrayList<>();
-                        List<Rect> rects = new ArrayList<>();
-                        for (int i = 0; i < result.size(); ++i) {
-
-                            Mat level = result.get(i);
-
-                            for (int j = 0; j < level.rows(); ++j) {
-                                Mat row = level.row(j);
-                                Mat scores = row.colRange(5, level.cols());
-
-                                Core.MinMaxLocResult mm = Core.minMaxLoc(scores);
-
-                                float confidence = (float) mm.maxVal;
-
-                                Point classIdPoint = mm.maxLoc;
-
-                                if (confidence > confThreshold) {
-                                    int centerX = (int) (row.get(0, 0)[0] * image1.cols());
-                                    int centerY = (int) (row.get(0, 1)[0] * image1.rows());
-                                    int width = (int) (row.get(0, 2)[0] * image1.cols());
-                                    int height = (int) (row.get(0, 3)[0] * image1.rows());
-
-                                    int left = centerX - width / 2;
-                                    int top = centerY - height / 2;
-
-                                    clsIds.add((int) classIdPoint.x);
-                                    confs.add((float) confidence);
-
-                                    rects.add(new Rect(left, top, width, height));
-
-                                }
-                            }
-                        }
-
-                        int ArrayLength = confs.size();
-
-                        if (ArrayLength >= 1) {
-                            // Apply non-maximum suppression procedure.
-                            float nmsThresh = 0.2f;
-
-
-                            MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confs));
-
-                            Rect[] boxesArray = rects.toArray(new Rect[0]);
-                            MatOfRect boxes = new MatOfRect(boxesArray);
-                            MatOfInt indices = new MatOfInt();
-
-                            Dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThresh, indices);
-
-                            // Draw result boxes:
-                            int[] ind = indices.toArray();
-
-                            for (int i = 0; i < ind.length; ++i) {
-
-                                indlength=(i+1);
-
-                                int idx = ind[i];
-                                Rect box = boxesArray[idx];
-
-                                int idGuy = clsIds.get(idx);
-
-                                float conf = confs.get(idx);
-
-                                List<String> cocoNames = Arrays.asList("caries");
-
-                                int intConf = (int) (conf * 100);
-
-                                Imgproc.putText(image1,  intConf + "%", box.tl(), Core.FONT_HERSHEY_SIMPLEX, 2, new Scalar(0, 255, 0), 3);
-                                Imgproc.rectangle(image1, box.tl(), box.br(), new Scalar(255, 0, 0), 5);
-
-                            }
-                        }
-                        Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
-                        Utils.matToBitmap(image1,setimg);
-
-                        // 데이터베이스 주기 위한 서버 동작
-                        String cariesnumber = String.valueOf(indlength);
-                        String bitstring = BitmapToString(setimg);
-
-                        //String setimgstringutf = URLEncoder.encode(bitstring,"utf-8");
-
-                      //  byte[] a = bitmapToByteArray(setimg);
-                      //  String aa = new String(a);
 
 
                         Response.Listener<String> responseListener = new Response.Listener<String>() {
                             @Override
-                            public void onResponse(String result) {
+                            public void onResponse(String response) {
 
                                 try {
-                                    JSONObject jsonObject = new JSONObject( result );
-                                    //JSONArray jsonArray = jsonObject.getJSONArray("result");
+                                    JSONObject jsonObject = new JSONObject( response );
+                                    //JSONArray jsonArray = jsonObject.getJSONArray("response");
                                     String success = jsonObject.getString( "success" );
+                                    if(success.equals("true")) {
 
-                                    try {
-                                        Thread.sleep(5000);
-                                        Bitmap a=StringToBitmap(jsonObject.getString("UserImage"));
-                                        String b=jsonObject.getString("UserCaries");
-                                        Toast.makeText(getActivity().getApplicationContext(),b,Toast.LENGTH_SHORT).show();
-                                        String c=jsonObject.getString("UserText");
-                                        if(success.equals("true")) {
-                                            datalist.add(new ItemData(a,b,c));
-                                            RecyclerView.setAdapter(adapter);
-                                            RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-                                            adapter.notifyDataSetChanged();
-                                        } else {
-                                            Toast.makeText(getActivity().getApplicationContext(),"success구문에 들어가지못함",Toast.LENGTH_SHORT).show();
+                                        String a = jsonObject.getString("UserImage");
+                                        Uri uri = Uri.parse(a);
+                                        Thread.sleep(1000);
+                                        //String b=jsonObject.getString("UserCaries");
+                                        //Toast.makeText(getActivity().getApplicationContext(),b,Toast.LENGTH_SHORT).show();
+                                        //String c=jsonObject.getString("UserText");
+                                        //cv 처리
+
+                                        File imgFile = new  File(a);
+
+                                        if(imgFile.exists()){
+                                            myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+
                                         }
 
-                                        //  adapter.notifyDataSetChanged();
-                                        //  Toast.makeText(getContext(), "dddd", Toast.LENGTH_SHORT).show();
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
+                                        //bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
+                                        // Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Uri.parse(a));
 
+                                        Mat image1 = new Mat();
+
+                                        Bitmap copyimg= myBitmap.copy(Bitmap.Config.ARGB_8888, true);
+                                        Utils.bitmapToMat(copyimg, image1);
+                                        Imgproc.cvtColor(image1, image1, Imgproc.COLOR_RGBA2RGB);
+
+
+                                        Mat imageBlob = Dnn.blobFromImage(image1, 0.00392, new Size(416, 416), new Scalar(0, 0, 0));
+
+                                        tinyYolo.setInput(imageBlob);
+
+                                        List<Mat> result = new ArrayList<Mat>(3);
+
+                                        List<String> outBlobNames = new ArrayList<>();
+                                        outBlobNames.add(0, "yolo_82");
+                                        outBlobNames.add(1, "yolo_94");
+                                        outBlobNames.add(2, "yolo_106");
+
+                                        tinyYolo.forward(result, outBlobNames);
+
+
+                                        float confThreshold = 0.3f;
+
+                                        List<Integer> clsIds = new ArrayList<>();
+                                        List<Float> confs = new ArrayList<>();
+                                        List<Rect> rects = new ArrayList<>();
+                                        for (int i = 0; i < result.size(); ++i) {
+
+                                            Mat level = result.get(i);
+
+                                            for (int j = 0; j < level.rows(); ++j) {
+                                                Mat row = level.row(j);
+                                                Mat scores = row.colRange(5, level.cols());
+
+                                                Core.MinMaxLocResult mm = Core.minMaxLoc(scores);
+
+                                                float confidence = (float) mm.maxVal;
+
+                                                Point classIdPoint = mm.maxLoc;
+
+                                                if (confidence > confThreshold) {
+                                                    int centerX = (int) (row.get(0, 0)[0] * image1.cols());
+                                                    int centerY = (int) (row.get(0, 1)[0] * image1.rows());
+                                                    int width = (int) (row.get(0, 2)[0] * image1.cols());
+                                                    int height = (int) (row.get(0, 3)[0] * image1.rows());
+
+                                                    int left = centerX - width / 2;
+                                                    int top = centerY - height / 2;
+
+                                                    clsIds.add((int) classIdPoint.x);
+                                                    confs.add((float) confidence);
+
+                                                    rects.add(new Rect(left, top, width, height));
+
+                                                }
+                                            }
+                                        }
+
+                                        int ArrayLength = confs.size();
+
+                                        if (ArrayLength >= 1) {
+                                            // Apply non-maximum suppression procedure.
+                                            float nmsThresh = 0.2f;
+
+
+                                            MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confs));
+
+                                            Rect[] boxesArray = rects.toArray(new Rect[0]);
+                                            MatOfRect boxes = new MatOfRect(boxesArray);
+                                            MatOfInt indices = new MatOfInt();
+
+                                            Dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThresh, indices);
+
+                                            // Draw result boxes:
+                                            int[] ind = indices.toArray();
+
+                                            for (int i = 0; i < ind.length; ++i) {
+
+                                                indlength=(i+1);
+
+                                                int idx = ind[i];
+                                                Rect box = boxesArray[idx];
+
+                                                int idGuy = clsIds.get(idx);
+
+                                                float conf = confs.get(idx);
+
+                                                List<String> cocoNames = Arrays.asList("caries");
+
+                                                int intConf = (int) (conf * 100);
+
+                                                Imgproc.putText(image1,  intConf + "%", box.tl(), Core.FONT_HERSHEY_SIMPLEX, 2, new Scalar(0, 255, 0), 3);
+                                                Imgproc.rectangle(image1, box.tl(), box.br(), new Scalar(255, 0, 0), 5);
+
+                                            }
+                                        }
+                                        //cv처리된 비트맵 이미지
+                                        Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
+                                        Utils.matToBitmap(image1,setimg);
+
+                                        // 데이터베이스 주기 위한 서버 동작
+                                        cariesnumber = String.valueOf(indlength);
+                                        //String bitstring = BitmapToString(setimg);
+                                        //String setimgstringutf = URLEncoder.encode(bitstring,"utf-8");
+
+                                        datalist.add(new ItemData(setimg,cariesnumber,visittext));
+                                        RecyclerView.setAdapter(adapter);
+                                        RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+                                        // adapter.notifyDataSetChanged();
+
+                                    } else {
+                                        Toast.makeText(getActivity().getApplicationContext(),"success구문에 들어가지못함",Toast.LENGTH_SHORT).show();
                                     }
 
                                 } catch (JSONException e) {
                                     Toast.makeText(getActivity().getApplicationContext(),"예외 (에러처리)",Toast.LENGTH_SHORT).show();
                                     e.printStackTrace();
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
                                 }
+
 
                             }
                         };
 
-                        if(indlength<=0) {
-                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,bitstring, cariesnumber,visittext, responseListener );
+                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail, realuri, responseListener );
                             RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
                             queue.add( databaseRequest );
-                        }
-                        else if(indlength>0&&indlength<3){
-                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,bitstring, cariesnumber,visittext2, responseListener );
-                            RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext() );
-                            queue.add( databaseRequest );
-                            indlength=0;
-                        }
-                        else
-                        {
-                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,bitstring, cariesnumber,visittext3, responseListener );
-                            RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
-                            queue.add( databaseRequest );
-                            indlength=0;
-                        }
+
                        /* datalist.add(new ItemData(setimg,String.valueOf(1),"aa"));
                         RecyclerView.setAdapter(adapter);
                         RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));*/
@@ -393,6 +405,18 @@ public Bitmap byteArrayToBitmap( byte[] byteArray ) {
         Bitmap bitmap = BitmapFactory.decodeByteArray( byteArray, 0, byteArray.length );
         return bitmap ;
     }
+
+private String getRealPathFromURI(Uri contentUri) {
+        if (contentUri.getPath().startsWith("/storage"))
+        {
+            return contentUri.getPath();
+        } String id = DocumentsContract.getDocumentId(contentUri).split(":")[1];
+        String[] columns = { MediaStore.Files.FileColumns.DATA };
+        String selection = MediaStore.Files.FileColumns._ID + " = " + id;
+        Cursor cursor = getActivity().getContentResolver().query(MediaStore.Files.getContentUri("external"), columns, selection, null, null);
+        try { int columnIndex = cursor.getColumnIndex(columns[0]);
+            if (cursor.moveToFirst()) { return cursor.getString(columnIndex); } }
+        finally { cursor.close(); } return null; }
 
 
 

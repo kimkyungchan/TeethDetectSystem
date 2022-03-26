@@ -12,14 +12,14 @@ public class DatabaseRequest extends StringRequest {
 final static private String URL = "http://lsh2952.dothome.co.kr/Database.php";
 private Map<String, String> map;
 
-public DatabaseRequest(String userEmail,String setimg, String cariesnumber,String visittext, Response.Listener<String> listener) {
+public DatabaseRequest(String userEmail,String setimg, Response.Listener<String> listener) {
     super(Method.POST, URL, listener, null);
 
     map = new HashMap<>();
     map.put("UserEmail", userEmail);
     map.put("UserImage", setimg);
-    map.put("UserCaries", cariesnumber);
-    map.put("UserText", visittext);
+    //map.put("UserCaries", cariesnumber);
+   // map.put("UserText", visittext);
 
 }
 
