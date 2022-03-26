@@ -39,23 +39,24 @@ protected void onCreate(Bundle savedInstanceState) {
     });
 
     btn_login = findViewById( R.id.login_button );
+
     btn_login.setOnClickListener( new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             String userEmail = et_id.getText().toString();
             String userPass = et_pass.getText().toString();
 
+
             Response.Listener<String> responseListener = new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     try {
                         JSONObject jsonObject = new JSONObject( response );
-                        boolean success = jsonObject.getBoolean( "success" );
-                        if(success) {//로그인 성공시
-
+                        String success = jsonObject.getString( "success" );
+                        if(success.equals("true")) {//로그인 성공시
                             Toast.makeText( getApplicationContext(), "로그인 성공", Toast.LENGTH_SHORT ).show();
                             Intent intent = new Intent( LoginActivity.this, HomeActivity.class );
-
+                            intent.putExtra("userEmail",userEmail);
                             startActivity( intent );
 
                         } else {//로그인 실패시
@@ -64,7 +65,9 @@ protected void onCreate(Bundle savedInstanceState) {
                         }
 
                     } catch (JSONException e) {
+                        Toast.makeText(LoginActivity.this,"예외 (에러처리)",Toast.LENGTH_SHORT).show();
                         e.printStackTrace();
+
                     }
                 }
             };

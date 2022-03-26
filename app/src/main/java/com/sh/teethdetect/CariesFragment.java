@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
+import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +21,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.OpenCVLoader;
@@ -37,7 +46,9 @@ import org.opencv.dnn.Net;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -67,6 +78,8 @@ public class CariesFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_caries, container, false);
 
+        adapter.notifyDataSetChanged();
+
         pictureGet = v.findViewById(R.id.pictureGet);
         RecyclerView = v.findViewById(R.id.Recyclerview);
 
@@ -92,7 +105,7 @@ public class CariesFragment extends Fragment {
 
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                intent.putExtra(Intent.ACTION_GET_CONTENT, true);
                 startActivityForResult(intent, CARIES_REQUEST);
             }
         });
@@ -121,6 +134,12 @@ public class CariesFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+
+        Bundle bundle = getArguments();
+        //로그인한 아이디 값 저장 변수
+        String userEmail = bundle.getString("userEmail");
+
 
         String visittext = "정상 치아일 확률이 높습니다. 주기적으로 치아검진은 필수입니다";
         String visittext2= "충치로 의심되는 부분이 있습니다. 치과 방문을 권장합니다.";
@@ -236,19 +255,72 @@ public class CariesFragment extends Fragment {
                         Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
                          Utils.matToBitmap(image1,setimg);
 
+                        // 데이터베이스 주기 위한 서버 동작
+                        String cariesnumber = String.valueOf(indlength);
+                        String bitstring = BitmapToString(setimg);
+                        String setimgstringutf = URLEncoder.encode(bitstring,"utf-8");
+
+                      //  byte[] a = bitmapToByteArray(setimg);
+                      //  String aa = new String(a);
+
+
+                        Response.Listener<String> responseListener = new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String result) {
+
+                                try {
+                                    JSONObject jsonObject = new JSONObject( result );
+                                    //JSONArray jsonArray = jsonObject.getJSONArray("result");
+                                    String success = jsonObject.getString( "success" );
+
+                                    try {
+                                        Thread.sleep(5000);
+                                        Bitmap a=StringToBitmap(jsonObject.getString("UserImage"));
+                                        String b=jsonObject.getString("UserCaries");
+                                        Toast.makeText(getActivity().getApplicationContext(),b,Toast.LENGTH_SHORT).show();
+                                        String c=jsonObject.getString("UserText");
+                                        if(success.equals("true")) {
+                                            datalist.add(new ItemData(setimg,b,c));
+                                            RecyclerView.setAdapter(adapter);
+                                            RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+                                        } else {
+                                            Toast.makeText(getActivity().getApplicationContext(),"success구문에 들어가지못함",Toast.LENGTH_SHORT).show();
+                                        }
+
+                                        //  adapter.notifyDataSetChanged();
+                                        //  Toast.makeText(getContext(), "dddd", Toast.LENGTH_SHORT).show();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+
+                                    }
+
+                                } catch (JSONException e) {
+                                    Toast.makeText(getActivity().getApplicationContext(),"예외 (에러처리)",Toast.LENGTH_SHORT).show();
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        };
+
                         if(indlength<=0){
-                            datalist.add(new ItemData(setimg,String.valueOf(indlength),visittext));
+                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,setimgstringutf, cariesnumber,visittext, responseListener );
+                            RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
+                            queue.add( databaseRequest );
                         }
                         else if(indlength>0&&indlength<3){
-                            datalist.add(new ItemData(setimg,String.valueOf(indlength),visittext2));
+                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,setimgstringutf, cariesnumber,visittext2, responseListener );
+                            RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext() );
+                            queue.add( databaseRequest );
                             indlength=0;
                         }
                         else
                         {
-                            datalist.add(new ItemData(setimg,String.valueOf(indlength),visittext3));
+                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,setimgstringutf, cariesnumber,visittext3, responseListener );
+                            RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
+                            queue.add( databaseRequest );
                             indlength=0;
                         }
-
+                        datalist.add(new ItemData(setimg,String.valueOf(1),"aa"));
                         RecyclerView.setAdapter(adapter);
                         RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
                     }
@@ -283,6 +355,41 @@ public class CariesFragment extends Fragment {
         if (cameraBridgeViewBase != null) {
             cameraBridgeViewBase.disableView();
         }
+
+
     }
+
+public static String BitmapToString(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,10 , baos);
+        byte[] bytes = baos.toByteArray();
+        String temp = Base64.encodeToString(bytes, Base64.DEFAULT); return temp;
+    }
+
+public byte[] BitmapToByteArray( Bitmap $bitmap ) {
+    ByteArrayOutputStream stream = new ByteArrayOutputStream() ;
+    $bitmap.compress( Bitmap.CompressFormat.JPEG, 100, stream) ;
+    byte[] byteArray = stream.toByteArray() ;
+    return byteArray ;
+}
+public static Bitmap StringToBitmap(String encodedString) {
+    try {
+        byte[] encodeByte = Base64.decode(encodedString, Base64.DEFAULT);
+        Bitmap bitmap = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+        return bitmap;
+    }
+    catch (Exception e) {
+        e.getMessage();
+        return null;
+    }
+}
+// Byte를 Bitmap으로 변환
+public Bitmap byteArrayToBitmap( byte[] byteArray ) {
+        Bitmap bitmap = BitmapFactory.decodeByteArray( byteArray, 0, byteArray.length );
+        return bitmap ;
+    }
+
+
+
 
 }

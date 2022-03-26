@@ -36,7 +36,6 @@ public class ViewHolder extends RecyclerView.ViewHolder {
 
     ViewHolder(View itemView) {
         super(itemView) ;
-
         // 뷰 객체에 대한 참조.
         dataimage = itemView.findViewById(R.id.teethimageview);
         datainfo = itemView.findViewById(R.id.teethInfoText);
@@ -69,7 +68,7 @@ public void onBindViewHolder(MultiImageAdapter.ViewHolder holder, int position) 
 // getItemCount() - 전체 데이터 갯수 리턴.
 @Override
 public int getItemCount() {
-    return itemData.size() ;
+    return
+            itemData.size();
 }
-
 }

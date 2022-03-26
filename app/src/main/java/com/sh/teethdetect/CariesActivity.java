@@ -1,3 +1,4 @@
+/*
 package com.sh.teethdetect;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,6 +19,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import android.os.Environment;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.OpenCVLoader;
@@ -38,6 +45,7 @@ import org.opencv.dnn.Dnn;
 import org.opencv.utils.Converters;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,6 +73,12 @@ Net tinyYolo;
 private static final int CARIES_REQUEST = 0;
 private ImageView imageView2;
 private Button pictureGet, videoGet;
+
+//아이템데이터클래스에 있는 값들을 어댑터를통해 캐리스액티비티에 넣어준다.
+//아이템데이터클래스에 있는 값들을 데이터베이스에 넣고 어댑터를 통해 캐리스액티비티에 넣어준다.
+
+
+
 
 
 @Override
@@ -240,6 +254,10 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
                     }
                     Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
                     Utils.matToBitmap(image1,setimg);
+                    //데이터베이스에 넣을때, setimg값을 바이트어레이로 바꿈, 텍스트들은 그대로넣어줌.
+//바이트어레이를 가져와서 bitmap으로 바꿔야함.
+
+
 
                     if(indlength<=0){
                         datalist.add(new ItemData(setimg,String.valueOf(indlength),visittext));
@@ -257,31 +275,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
                     RecyclerView.setAdapter(adapter);
                     RecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
                 }
-                        /*else {      // 이미지를 여러장 선택한 경우
-                            ClipData clipData = data.getClipData();
-                            Log.e("clipData", String.valueOf(clipData.getItemCount()));
 
-                            if (clipData.getItemCount() > 10) {   // 선택한 이미지가 11장 이상인 경우
-                                Toast.makeText(getApplicationContext(), "사진은 10장까지 선택 가능합니다.", Toast.LENGTH_LONG).show();
-                            }
-                            else {   // 선택한 이미지가 1장 이상 10장 이하인 경우
-                                Log.e(TAG, "multiple choice");
-
-                                for (int i = 0; i < clipData.getItemCount(); i++) {
-                                    Bitmap img = clipData.getItemAt(i).getUri();  // 선택한 이미지들의 uri를 가져온다.
-                                    try {
-                                        bitmap.add(img);  //uri를 list에 담는다.
-
-                                    } catch (Exception e) {
-                                        Log.e(TAG, "File select error", e);
-                                    }
-                                }
-
-                                adapter = new MultiImageAdapter(uriList, getApplicationContext());
-                                RecyclerView.setAdapter(adapter);   // 리사이클러뷰에 어댑터 세팅
-                                RecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true));     // 리사이클러뷰 수평 스크롤 적용
-                            }
-                        }*/
             }
         }
     } catch (Exception e) {}
@@ -315,4 +309,17 @@ protected void onDestroy() {
     }
 }
 
+public byte[] bitmapToByteArray( Bitmap bitmap ) {
+    ByteArrayOutputStream stream = new ByteArrayOutputStream() ;
+    bitmap.compress( Bitmap.CompressFormat.JPEG, 100, stream) ;
+    byte[] byteArray = stream.toByteArray() ;
+    return byteArray ;
 }
+
+public Bitmap byteArrayToBitmap( byte[] $byteArray ) {
+    Bitmap bitmap = BitmapFactory.decodeByteArray( $byteArray, 0, $byteArray.length ) ;
+    return bitmap ;
+}
+
+
+}*/

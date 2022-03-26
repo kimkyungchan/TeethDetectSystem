@@ -50,12 +50,17 @@ Net tinyYolo;
 int indlength=0;
 ArrayList<ItemData> datalist = new ArrayList<>();
 MultiImageAdapter adapter = new MultiImageAdapter(datalist);
+CariesFragment cariesFragment;
 
 @Override
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_home);
     bottomNavigationView = findViewById(R.id.navi_bar);
+
+    Intent intent = getIntent();
+    String userEmail = intent.getStringExtra("userEmail");
+
 
     baseLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -80,7 +85,14 @@ protected void onCreate(Bundle savedInstanceState) {
 
             switch (menuItem.getItemId()){
                 case R.id.item_fragment1:
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,new CariesFragment()).commit();
+                    cariesFragment = new CariesFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,cariesFragment).commit();
+
+                    Bundle bundle =new Bundle();
+                    bundle.putString("userEmail",userEmail);
+                    cariesFragment.setArguments(bundle);
+
+
                     break;
                 case R.id.item_fragment2:
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,new VideoWindowsActivityFragment()).commit();
@@ -122,26 +134,5 @@ protected void onDestroy() {
     if (cameraBridgeViewBase != null) {
         cameraBridgeViewBase.disableView();
     }
-}
-
- @Override
-public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-    try {
-        if (requestCode == CARIES_REQUEST) {
-
-            if (data == null) {   // 어떤 이미지도 선택하지 않은 경우
-                Toast.makeText(this, "이미지를 선택하지 않았습니다.", Toast.LENGTH_LONG).show();
-            } else {   // 이미지를 하나라도 선택한 경우
-                if (data.getClipData() == null) {     // 이미지를 하나만 선택한 경우
-                    Log.e("single choice: ", String.valueOf(data.getData()));
-                    InputStream in = getContentResolver().openInputStream(data.getData());
-                    Bitmap img = BitmapFactory.decodeStream(in);
-                    in.close();
-                }
-            }
-        }
-    } catch (Exception e) {}
-    super.onActivityResult(requestCode, resultCode, data);
 }
 }
