@@ -82,6 +82,7 @@ public class CariesFragment extends Fragment {
 
         pictureGet = v.findViewById(R.id.pictureGet);
         RecyclerView = v.findViewById(R.id.Recyclerview);
+        adapter.notifyDataSetChanged();
 
         pictureGet.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -103,9 +104,9 @@ public class CariesFragment extends Fragment {
                     startYolo = false;
                 }
 
-                Intent intent = new Intent(Intent.ACTION_PICK);
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                intent.putExtra(Intent.ACTION_GET_CONTENT, true);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(intent, CARIES_REQUEST);
             }
         });
@@ -253,12 +254,13 @@ public class CariesFragment extends Fragment {
                             }
                         }
                         Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
-                         Utils.matToBitmap(image1,setimg);
+                        Utils.matToBitmap(image1,setimg);
 
                         // 데이터베이스 주기 위한 서버 동작
                         String cariesnumber = String.valueOf(indlength);
                         String bitstring = BitmapToString(setimg);
-                        String setimgstringutf = URLEncoder.encode(bitstring,"utf-8");
+
+                        //String setimgstringutf = URLEncoder.encode(bitstring,"utf-8");
 
                       //  byte[] a = bitmapToByteArray(setimg);
                       //  String aa = new String(a);
@@ -280,9 +282,10 @@ public class CariesFragment extends Fragment {
                                         Toast.makeText(getActivity().getApplicationContext(),b,Toast.LENGTH_SHORT).show();
                                         String c=jsonObject.getString("UserText");
                                         if(success.equals("true")) {
-                                            datalist.add(new ItemData(setimg,b,c));
+                                            datalist.add(new ItemData(a,b,c));
                                             RecyclerView.setAdapter(adapter);
                                             RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+                                            adapter.notifyDataSetChanged();
                                         } else {
                                             Toast.makeText(getActivity().getApplicationContext(),"success구문에 들어가지못함",Toast.LENGTH_SHORT).show();
                                         }
@@ -302,27 +305,27 @@ public class CariesFragment extends Fragment {
                             }
                         };
 
-                        if(indlength<=0){
-                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,setimgstringutf, cariesnumber,visittext, responseListener );
+                        if(indlength<=0) {
+                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,bitstring, cariesnumber,visittext, responseListener );
                             RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
                             queue.add( databaseRequest );
                         }
                         else if(indlength>0&&indlength<3){
-                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,setimgstringutf, cariesnumber,visittext2, responseListener );
+                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,bitstring, cariesnumber,visittext2, responseListener );
                             RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext() );
                             queue.add( databaseRequest );
                             indlength=0;
                         }
                         else
                         {
-                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,setimgstringutf, cariesnumber,visittext3, responseListener );
+                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail,bitstring, cariesnumber,visittext3, responseListener );
                             RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
                             queue.add( databaseRequest );
                             indlength=0;
                         }
-                        datalist.add(new ItemData(setimg,String.valueOf(1),"aa"));
+                       /* datalist.add(new ItemData(setimg,String.valueOf(1),"aa"));
                         RecyclerView.setAdapter(adapter);
-                        RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+                        RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));*/
                     }
                 }
             }
@@ -363,12 +366,14 @@ public static String BitmapToString(Bitmap bitmap) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG,10 , baos);
         byte[] bytes = baos.toByteArray();
-        String temp = Base64.encodeToString(bytes, Base64.DEFAULT); return temp;
+        String temp = Base64.encodeToString(bytes, Base64.DEFAULT);
+
+        return temp;
     }
 
 public byte[] BitmapToByteArray( Bitmap $bitmap ) {
     ByteArrayOutputStream stream = new ByteArrayOutputStream() ;
-    $bitmap.compress( Bitmap.CompressFormat.JPEG, 100, stream) ;
+    $bitmap.compress( Bitmap.CompressFormat.JPEG, 10, stream) ;
     byte[] byteArray = stream.toByteArray() ;
     return byteArray ;
 }

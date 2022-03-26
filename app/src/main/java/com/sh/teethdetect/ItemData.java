@@ -39,8 +39,8 @@ public String getDatapercent() {
     return visittext;
 }
 
-public void setDatapercent(String datapercent) {
-    this.visittext = datapercent;
+public void setDatapercent(String visittext) {
+    this.visittext = visittext;
 }
 
 
