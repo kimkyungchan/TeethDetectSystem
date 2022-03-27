@@ -12,14 +12,16 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.9"
+            android:layout_weight="0.92"
             tools:context=".MapsActivity" />
 
         <Button
             android:text="주변장소검색"
+            android:background="@color/black"
+            android:textColor="@color/white"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.1"
+            android:layout_weight="0.08"
             android:id="@+id/button"/>
 
 
