@@ -92,6 +92,7 @@ public class CariesFragment extends Fragment {
 
         pictureGet = v.findViewById(R.id.pictureGet);
         RecyclerView = v.findViewById(R.id.Recyclerview);
+
         adapter.notifyDataSetChanged();
 
         pictureGet.setOnClickListener(new View.OnClickListener() {
@@ -186,9 +187,11 @@ public class CariesFragment extends Fragment {
                                     JSONObject jsonObject = new JSONObject( response );
                                     //JSONArray jsonArray = jsonObject.getJSONArray("response");
                                     String success = jsonObject.getString( "success" );
+
                                     if(success.equals("true")) {
 
                                         String a = jsonObject.getString("UserImage");
+
                                         Uri uri = Uri.parse(a);
                                         Thread.sleep(1000);
                                         //String b=jsonObject.getString("UserCaries");
@@ -314,7 +317,7 @@ public class CariesFragment extends Fragment {
                                         datalist.add(new ItemData(setimg,cariesnumber,visittext));
                                         RecyclerView.setAdapter(adapter);
                                         RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-                                        // adapter.notifyDataSetChanged();
+                                        adapter.notifyDataSetChanged();
 
                                     } else {
                                         Toast.makeText(getActivity().getApplicationContext(),"success구문에 들어가지못함",Toast.LENGTH_SHORT).show();
@@ -417,6 +420,9 @@ private String getRealPathFromURI(Uri contentUri) {
         try { int columnIndex = cursor.getColumnIndex(columns[0]);
             if (cursor.moveToFirst()) { return cursor.getString(columnIndex); } }
         finally { cursor.close(); } return null; }
+
+
+
 
 
 

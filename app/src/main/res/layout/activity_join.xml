@@ -14,6 +14,7 @@
         android:text="회원가입"
         android:textSize="30sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/join_name"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -75,6 +76,7 @@
         android:layout_marginEnd="97dp"
         android:layout_marginRight="97dp"
         android:text="확인"
+        android:background="@color/black"
         app:layout_constraintBaseline_toBaselineOf="@+id/join_email"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -86,6 +88,7 @@
         android:layout_marginStart="36dp"
         android:layout_marginLeft="36dp"
         android:layout_marginTop="71dp"
+        android:background="@color/black"
         android:text="취소"
         app:layout_constraintStart_toEndOf="@+id/join_button"
         app:layout_constraintTop_toBottomOf="@+id/join_pwck" />
@@ -93,6 +96,7 @@
     <Button
         android:id="@+id/join_button"
         style="@style/defaultButton"
+        android:background="@color/black"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"

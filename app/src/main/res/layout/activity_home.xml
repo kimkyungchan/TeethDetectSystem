@@ -11,6 +11,9 @@
         android:id="@+id/navi_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:itemTextColor="@drawable/menu_selector_color"
+        app:itemIconTint="@drawable/menu_selector_color"
         app:menu="@menu/navibar">
 
     </com.google.android.material.bottomnavigation.BottomNavigationView>

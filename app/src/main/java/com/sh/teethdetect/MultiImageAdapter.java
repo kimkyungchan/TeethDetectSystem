@@ -60,6 +60,7 @@ public MultiImageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int vie
 @Override
 public void onBindViewHolder(MultiImageAdapter.ViewHolder holder, int position) {
    ItemData item = itemData.get(position);
+   
    holder.dataimage.setImageBitmap(item.getDataImage());
    holder.datainfo.setText("충치개수 : "+item.getDatainfo());
    holder.datadetect.setText(item.getDatapercent());

@@ -15,8 +15,18 @@
                 android:id="@+id/pictureGet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/black"
                 android:layout_weight="0.1"
+                android:textColor="@color/white"
                 android:text="치아사진으로 충치 검진" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:text="치아 검진 결과는 아래에 나열 됩니다."
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/black"/>
 
 
         <androidx.recyclerview.widget.RecyclerView
