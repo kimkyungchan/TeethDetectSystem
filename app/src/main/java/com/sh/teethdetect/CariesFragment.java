@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -59,6 +60,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 
 public class CariesFragment extends Fragment {
@@ -308,7 +310,7 @@ public class CariesFragment extends Fragment {
                                         //cv처리된 비트맵 이미지
                                         Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
                                         Utils.matToBitmap(image1,setimg);
-
+                                        Toast.makeText(getActivity().getApplicationContext(),"충치 검진 결과를 확인하세요.",Toast.LENGTH_SHORT).show();
                                         // 데이터베이스 주기 위한 서버 동작
                                         cariesnumber = String.valueOf(indlength);
                                         //String bitstring = BitmapToString(setimg);
@@ -420,11 +422,6 @@ private String getRealPathFromURI(Uri contentUri) {
         try { int columnIndex = cursor.getColumnIndex(columns[0]);
             if (cursor.moveToFirst()) { return cursor.getString(columnIndex); } }
         finally { cursor.close(); } return null; }
-
-
-
-
-
 
 
 }

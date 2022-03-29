@@ -94,6 +94,7 @@ private View mLayout;  // Snackbar 사용하기 위해서는 View가 필요합�
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    Toast.makeText(getApplicationContext(),"버튼을 누르면 반경 2km내에 치과가 검색됩니다.",Toast.LENGTH_SHORT).show();
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -126,6 +127,7 @@ protected void onCreate(Bundle savedInstanceState) {
     button.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            Toast.makeText(getApplicationContext(),"검색중입니다.",Toast.LENGTH_SHORT).show();
             showPlaceInformation(currentPosition);
         }
     });

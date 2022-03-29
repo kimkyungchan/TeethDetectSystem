@@ -1,4 +1,3 @@
-/*
 package com.sh.teethdetect;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -70,6 +69,8 @@ boolean startYolo = false;
 boolean firstTimeYolo = false;
 Net tinyYolo;
 
+long first_time, second_time;
+
 private static final int CARIES_REQUEST = 0;
 private ImageView imageView2;
 private Button pictureGet, videoGet;
@@ -109,9 +110,9 @@ protected void onCreate(Bundle savedInstanceState) {
                 startYolo = false;
             }
 
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            intent.putExtra(Intent.ACTION_GET_CONTENT, true);
             startActivityForResult(intent, CARIES_REQUEST);
         }
     });
@@ -136,6 +137,8 @@ protected void onCreate(Bundle savedInstanceState) {
     };
 
 }
+
+
 
 @Override
 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -321,5 +324,11 @@ public Bitmap byteArrayToBitmap( byte[] $byteArray ) {
     return bitmap ;
 }
 
+//뒤로가기 버튼 클릭하고 2초안에 재클릭시 NonLoginActivity로 이동
+@Override
+public void onBackPressed() {
 
-}*/
+    super.onBackPressed();
+}
+
+}

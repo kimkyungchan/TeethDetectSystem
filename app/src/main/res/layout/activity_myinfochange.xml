@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/white"
-    tools:context=".LoginActivity">
+    tools:context=".MyInfoChangeActivity">
 
     <ImageView
         android:layout_width="120dp"
@@ -18,7 +18,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LOGIN"
+        android:text="회원정보변경"
         android:textColor="@color/black"
         android:textSize="30dp"
         android:gravity="center"
@@ -29,57 +29,37 @@
 
     <EditText
         android:layout_gravity="center"
-        android:id="@+id/login_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
-        android:ems="10"
-        android:hint="이메일"
-        android:inputType="textEmailAddress"
-        />
-
-    <EditText
-        android:layout_gravity="center"
-        android:id="@+id/login_password"
+        android:id="@+id/mypage_pass"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="30dp"
         android:ems="10"
         android:hint="비밀번호"
+        android:inputType="textEmailAddress"
+        />
+
+    <EditText
+        android:layout_gravity="center"
+        android:id="@+id/mypage_passcheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="70dp"
+        android:ems="10"
+        android:hint="비밀번호 확인"
         android:inputType="textPassword"
         />
 
-
     <Button
-        android:id="@+id/login_button"
+        android:id="@+id/mypage_changebt"
         style="@style/defaultButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="130dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:layout_marginBottom="20dp"
         android:background="@color/black"
-        android:text="로그인"
+        android:text="비밀번호 변경"
          />
 
-    <Button
-        android:id="@+id/join_button"
-        style="@style/defaultButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/black"
-        android:layout_gravity="center"
-        android:text="회원가입"
-         />
 
-    <Button
-        android:id="@+id/nonLogin_button"
-        style="@style/defaultButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/black"
-        android:layout_gravity="center"
-        android:text="비회원 로그인"
-        android:layout_marginTop="20dp"
-        />
 
 </LinearLayout>

@@ -3,6 +3,7 @@ package com.sh.teethdetect;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.content.Intent;
@@ -41,6 +42,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
+
 private androidx.recyclerview.widget.RecyclerView RecyclerView; // 이미지를 보여줄 리사이클러뷰
 BaseLoaderCallback baseLoaderCallback;
 CameraBridgeViewBase cameraBridgeViewBase;
@@ -51,6 +53,7 @@ int indlength=0;
 ArrayList<ItemData> datalist = new ArrayList<>();
 MultiImageAdapter adapter = new MultiImageAdapter(datalist);
 CariesFragment cariesFragment;
+HomeFragment homeFragment;
 
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +61,11 @@ protected void onCreate(Bundle savedInstanceState) {
     setContentView(R.layout.activity_home);
     bottomNavigationView = findViewById(R.id.navi_bar);
 
+    homeFragment = new HomeFragment();
+    setDefaultFragment();
+
     Intent intent = getIntent();
     String userEmail = intent.getStringExtra("userEmail");
-
 
     baseLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -107,6 +112,13 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 }
+
+    public void setDefaultFragment(){
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.main_frame, homeFragment);
+        transaction.commit();
+
+    }
 @Override
 protected void onResume() {
     super.onResume();
