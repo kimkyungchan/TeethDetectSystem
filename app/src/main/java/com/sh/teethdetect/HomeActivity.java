@@ -54,6 +54,7 @@ ArrayList<ItemData> datalist = new ArrayList<>();
 MultiImageAdapter adapter = new MultiImageAdapter(datalist);
 CariesFragment cariesFragment;
 HomeFragment homeFragment;
+MyPageFragment mypagefragment;
 
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +105,14 @@ protected void onCreate(Bundle savedInstanceState) {
                     break;
                 case R.id.item_fragment3:
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,new MapsFragment()).commit();
+                    break;
+                case R.id.item_fragment4:
+                    mypagefragment = new MyPageFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,mypagefragment).commit();
+                    Bundle bundle1 =new Bundle();
+                    bundle1.putString("userEmail",userEmail);
+                    mypagefragment.setArguments(bundle1);
+
                     break;
             }
             return;
