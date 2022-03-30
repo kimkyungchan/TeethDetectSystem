@@ -1,6 +1,5 @@
 package com.sh.teethdetect;
 
-import android.content.ClipData;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -9,12 +8,9 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Base64;
@@ -53,14 +49,9 @@ import org.opencv.utils.Converters;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 
 public class CariesFragment extends Fragment {
@@ -90,8 +81,82 @@ public class CariesFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_caries, container, false);
 
-       // adapter.notifyDataSetChanged();
+        Toast.makeText(getActivity().getApplicationContext(),"과거 검진 리스트를 불러오는 중입니다(10초가량소요) 과거 검진이력이 없으면 불러오지않습니다.",Toast.LENGTH_SHORT).show();
+        baseLoaderCallback = new BaseLoaderCallback(getActivity()) {
+            @Override
+            public void onManagerConnected(int status) {
+                super.onManagerConnected(status);
 
+                switch (status) {
+
+                    case BaseLoaderCallback.SUCCESS:
+                        // cameraBridgeViewBase.enableView();
+                        break;
+                    default:
+                        super.onManagerConnected(status);
+                        break;
+                }
+            }
+        };
+
+        Bundle bundle = getArguments();
+        //로그인한 아이디 값 저장 변수
+        String userEmail = bundle.getString("userEmail");
+
+        //caries프래그먼트가 실행이되면 서버에서 이미지경로를 가져와서 set해줘야함
+        Response.Listener<String> responseListener = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                try {
+
+                    if (startYolo == false) {
+
+                        startYolo = true;
+
+                        if (firstTimeYolo == false) {
+
+                            firstTimeYolo = true;
+                            String tinyYoloCfg = Environment.getExternalStorageDirectory() + "/dnns/teeth-train-yolo.cfg";
+                            String tinyYoloWeights = Environment.getExternalStorageDirectory() + "/dnns/6000.weights";
+
+                            tinyYolo = Dnn.readNetFromDarknet(tinyYoloCfg, tinyYoloWeights);
+                        }
+                    } else {
+                        startYolo = false;
+                    }
+
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("res");
+
+                    for(int i=0; i<jsonArray.length(); i++){
+                        JSONObject c = jsonArray.getJSONObject(i);
+                        String a = c.getString("UserImage");
+
+                        Log.e("받아지냐 시발 받아졌다",a);
+                        File imgFile = new  File(a);
+                        if(imgFile.exists()){
+                            myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                        }
+                        getOpenCv(myBitmap);
+                    }
+
+
+                } catch (JSONException e) {
+                    Toast.makeText(getActivity().getApplicationContext(),"예외 (에러처리)",Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                }
+
+
+            }
+        };
+
+        DatabaseDownRequest databaseDownRequest = new DatabaseDownRequest(userEmail, responseListener );
+        RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
+        queue.add( databaseDownRequest );
+
+
+        // 사진가져오기버튼 구현
         pictureGet = v.findViewById(R.id.pictureGet);
         RecyclerView = v.findViewById(R.id.Recyclerview);
 
@@ -124,22 +189,7 @@ public class CariesFragment extends Fragment {
             }
         });
 
-        baseLoaderCallback = new BaseLoaderCallback(getActivity()) {
-            @Override
-            public void onManagerConnected(int status) {
-                super.onManagerConnected(status);
 
-                switch (status) {
-
-                    case BaseLoaderCallback.SUCCESS:
-                        // cameraBridgeViewBase.enableView();
-                        break;
-                    default:
-                        super.onManagerConnected(status);
-                        break;
-                }
-            }
-        };
 
         return v;
     } //oncreateview
@@ -154,10 +204,6 @@ public class CariesFragment extends Fragment {
         //로그인한 아이디 값 저장 변수
         String userEmail = bundle.getString("userEmail");
 
-
-        String visittext = "정상 치아일 확률이 높습니다. 주기적으로 치아검진은 필수입니다";
-        String visittext2= "충치로 의심되는 부분이 있습니다. 치과 방문을 권장합니다.";
-        String visittext3= "충치로 의심되는 부분이 너무 많습니다. 빠른 시일내에 치과 방문을 권장합니다.";
 
 
         try {
@@ -211,115 +257,10 @@ public class CariesFragment extends Fragment {
                                         //bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), uri);
                                         // Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), Uri.parse(a));
 
-                                        Mat image1 = new Mat();
+                                        // --
 
-                                        Bitmap copyimg= myBitmap.copy(Bitmap.Config.ARGB_8888, true);
-                                        Utils.bitmapToMat(copyimg, image1);
-                                        Imgproc.cvtColor(image1, image1, Imgproc.COLOR_RGBA2RGB);
+                                        getOpenCv(myBitmap);
 
-
-                                        Mat imageBlob = Dnn.blobFromImage(image1, 0.00392, new Size(416, 416), new Scalar(0, 0, 0));
-
-                                        tinyYolo.setInput(imageBlob);
-
-                                        List<Mat> result = new ArrayList<Mat>(3);
-
-                                        List<String> outBlobNames = new ArrayList<>();
-                                        outBlobNames.add(0, "yolo_82");
-                                        outBlobNames.add(1, "yolo_94");
-                                        outBlobNames.add(2, "yolo_106");
-
-                                        tinyYolo.forward(result, outBlobNames);
-
-
-                                        float confThreshold = 0.3f;
-
-                                        List<Integer> clsIds = new ArrayList<>();
-                                        List<Float> confs = new ArrayList<>();
-                                        List<Rect> rects = new ArrayList<>();
-                                        for (int i = 0; i < result.size(); ++i) {
-
-                                            Mat level = result.get(i);
-
-                                            for (int j = 0; j < level.rows(); ++j) {
-                                                Mat row = level.row(j);
-                                                Mat scores = row.colRange(5, level.cols());
-
-                                                Core.MinMaxLocResult mm = Core.minMaxLoc(scores);
-
-                                                float confidence = (float) mm.maxVal;
-
-                                                Point classIdPoint = mm.maxLoc;
-
-                                                if (confidence > confThreshold) {
-                                                    int centerX = (int) (row.get(0, 0)[0] * image1.cols());
-                                                    int centerY = (int) (row.get(0, 1)[0] * image1.rows());
-                                                    int width = (int) (row.get(0, 2)[0] * image1.cols());
-                                                    int height = (int) (row.get(0, 3)[0] * image1.rows());
-
-                                                    int left = centerX - width / 2;
-                                                    int top = centerY - height / 2;
-
-                                                    clsIds.add((int) classIdPoint.x);
-                                                    confs.add((float) confidence);
-
-                                                    rects.add(new Rect(left, top, width, height));
-
-                                                }
-                                            }
-                                        }
-
-                                        int ArrayLength = confs.size();
-
-                                        if (ArrayLength >= 1) {
-                                            // Apply non-maximum suppression procedure.
-                                            float nmsThresh = 0.2f;
-
-
-                                            MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confs));
-
-                                            Rect[] boxesArray = rects.toArray(new Rect[0]);
-                                            MatOfRect boxes = new MatOfRect(boxesArray);
-                                            MatOfInt indices = new MatOfInt();
-
-                                            Dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThresh, indices);
-
-                                            // Draw result boxes:
-                                            int[] ind = indices.toArray();
-
-                                            for (int i = 0; i < ind.length; ++i) {
-
-                                                indlength=(i+1);
-
-                                                int idx = ind[i];
-                                                Rect box = boxesArray[idx];
-
-                                                int idGuy = clsIds.get(idx);
-
-                                                float conf = confs.get(idx);
-
-                                                List<String> cocoNames = Arrays.asList("caries");
-
-                                                int intConf = (int) (conf * 100);
-
-                                                Imgproc.putText(image1,  intConf + "%", box.tl(), Core.FONT_HERSHEY_SIMPLEX, 2, new Scalar(0, 255, 0), 3);
-                                                Imgproc.rectangle(image1, box.tl(), box.br(), new Scalar(255, 0, 0), 5);
-
-                                            }
-                                        }
-                                        //cv처리된 비트맵 이미지
-                                        Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
-                                        Utils.matToBitmap(image1,setimg);
-                                        Toast.makeText(getActivity().getApplicationContext(),"충치 검진 결과를 확인하세요.",Toast.LENGTH_SHORT).show();
-                                        // 데이터베이스 주기 위한 서버 동작
-                                        cariesnumber = String.valueOf(indlength);
-                                        //String bitstring = BitmapToString(setimg);
-                                        //String setimgstringutf = URLEncoder.encode(bitstring,"utf-8");
-
-                                        datalist.add(new ItemData(setimg,cariesnumber,visittext));
-                                        RecyclerView.setAdapter(adapter);
-                                        RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
-                                        adapter.notifyDataSetChanged();
 
                                     } else {
                                         Toast.makeText(getActivity().getApplicationContext(),"success구문에 들어가지못함",Toast.LENGTH_SHORT).show();
@@ -340,9 +281,6 @@ public class CariesFragment extends Fragment {
                             RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
                             queue.add( databaseRequest );
 
-                       /* datalist.add(new ItemData(setimg,String.valueOf(1),"aa"));
-                        RecyclerView.setAdapter(adapter);
-                        RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));*/
                     }
                 }
             }
@@ -422,6 +360,126 @@ private String getRealPathFromURI(Uri contentUri) {
         try { int columnIndex = cursor.getColumnIndex(columns[0]);
             if (cursor.moveToFirst()) { return cursor.getString(columnIndex); } }
         finally { cursor.close(); } return null; }
+
+
+        private void getOpenCv(Bitmap bitmap){
+
+            String visittext = "정상 치아일 확률이 높습니다. 주기적으로 치아검진은 필수입니다";
+            String visittext2= "충치로 의심되는 부분이 있습니다. 치과 방문을 권장합니다.";
+            String visittext3= "충치로 의심되는 부분이 너무 많습니다. 빠른 시일내에 치과 방문을 권장합니다.";
+
+            Mat image1 = new Mat();
+
+            Bitmap copyimg= bitmap.copy(Bitmap.Config.ARGB_8888, true);
+            Utils.bitmapToMat(copyimg, image1);
+            Imgproc.cvtColor(image1, image1, Imgproc.COLOR_RGBA2RGB);
+
+
+            Mat imageBlob = Dnn.blobFromImage(image1, 0.00392, new Size(416, 416), new Scalar(0, 0, 0));
+
+            tinyYolo.setInput(imageBlob);
+
+            List<Mat> result = new ArrayList<Mat>(3);
+
+            List<String> outBlobNames = new ArrayList<>();
+            outBlobNames.add(0, "yolo_82");
+            outBlobNames.add(1, "yolo_94");
+            outBlobNames.add(2, "yolo_106");
+
+            tinyYolo.forward(result, outBlobNames);
+
+
+            float confThreshold = 0.3f;
+
+            List<Integer> clsIds = new ArrayList<>();
+            List<Float> confs = new ArrayList<>();
+            List<Rect> rects = new ArrayList<>();
+            for (int i = 0; i < result.size(); ++i) {
+
+                Mat level = result.get(i);
+
+                for (int j = 0; j < level.rows(); ++j) {
+                    Mat row = level.row(j);
+                    Mat scores = row.colRange(5, level.cols());
+
+                    Core.MinMaxLocResult mm = Core.minMaxLoc(scores);
+
+                    float confidence = (float) mm.maxVal;
+
+                    Point classIdPoint = mm.maxLoc;
+
+                    if (confidence > confThreshold) {
+                        int centerX = (int) (row.get(0, 0)[0] * image1.cols());
+                        int centerY = (int) (row.get(0, 1)[0] * image1.rows());
+                        int width = (int) (row.get(0, 2)[0] * image1.cols());
+                        int height = (int) (row.get(0, 3)[0] * image1.rows());
+
+                        int left = centerX - width / 2;
+                        int top = centerY - height / 2;
+
+                        clsIds.add((int) classIdPoint.x);
+                        confs.add((float) confidence);
+
+                        rects.add(new Rect(left, top, width, height));
+
+                    }
+                }
+            }
+
+            int ArrayLength = confs.size();
+
+            if (ArrayLength >= 1) {
+                // Apply non-maximum suppression procedure.
+                float nmsThresh = 0.2f;
+
+
+                MatOfFloat confidences = new MatOfFloat(Converters.vector_float_to_Mat(confs));
+
+                Rect[] boxesArray = rects.toArray(new Rect[0]);
+                MatOfRect boxes = new MatOfRect(boxesArray);
+                MatOfInt indices = new MatOfInt();
+
+                Dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThresh, indices);
+
+                // Draw result boxes:
+                int[] ind = indices.toArray();
+
+                for (int i = 0; i < ind.length; ++i) {
+
+                    indlength=(i+1);
+
+                    int idx = ind[i];
+                    Rect box = boxesArray[idx];
+
+                    int idGuy = clsIds.get(idx);
+
+                    float conf = confs.get(idx);
+
+                    List<String> cocoNames = Arrays.asList("caries");
+
+                    int intConf = (int) (conf * 100);
+
+                    Imgproc.putText(image1,  intConf + "%", box.tl(), Core.FONT_HERSHEY_SIMPLEX, 2, new Scalar(0, 255, 0), 3);
+                    Imgproc.rectangle(image1, box.tl(), box.br(), new Scalar(255, 0, 0), 5);
+
+                }
+            }
+            //cv처리된 비트맵 이미지
+            Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
+            Utils.matToBitmap(image1,setimg);
+
+            Toast.makeText(getActivity().getApplicationContext(),"충치 검진 결과를 확인하세요.",Toast.LENGTH_SHORT).show();
+            // 데이터베이스 주기 위한 서버 동작
+            cariesnumber = String.valueOf(indlength);
+            //String bitstring = BitmapToString(setimg);
+            //String setimgstringutf = URLEncoder.encode(bitstring,"utf-8");
+
+            datalist.add(new ItemData(setimg,cariesnumber,visittext));
+            RecyclerView.setAdapter(adapter);
+            RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
+            adapter.notifyDataSetChanged();
+        }
+
 
 
 }
