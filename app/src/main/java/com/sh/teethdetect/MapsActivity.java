@@ -79,12 +79,13 @@ String[] REQUIRED_PERMISSIONS  = {Manifest.permission.ACCESS_FINE_LOCATION, Mani
 Location mCurrentLocatiion;
 LatLng currentPosition;
 
-
 private FusedLocationProviderClient mFusedLocationClient;
 private LocationRequest locationRequest;
 private Location location;
 
 List<Marker> previous_marker = null;
+
+int selected = 0;
 
 
 private View mLayout;  // Snackbar 사용하기 위해서는 View가 필요합니다.
@@ -94,7 +95,6 @@ private View mLayout;  // Snackbar 사용하기 위해서는 View가 필요합�
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    Toast.makeText(getApplicationContext(),"버튼을 누르면 반경 2km내에 치과가 검색됩니다.",Toast.LENGTH_SHORT).show();
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -127,8 +127,28 @@ protected void onCreate(Bundle savedInstanceState) {
     button.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Toast.makeText(getApplicationContext(),"검색중입니다.",Toast.LENGTH_SHORT).show();
-            showPlaceInformation(currentPosition);
+            String[] Item = new String[]{"500m","1km","2km","3km"};
+            int[] meters = new int[]{500,1000,2000,3000};
+            AlertDialog.Builder dialog = new AlertDialog.Builder(MapsActivity.this);
+
+            dialog.setTitle("검색 거리를 선택해주세요")
+                    .setSingleChoiceItems(Item, 0, new DialogInterface.OnClickListener() {
+                       @Override
+                       public void onClick(DialogInterface dialogInterface, int i) {
+                       selected=i;
+                       }
+                     })
+                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            int meter = meters[selected];
+                            showPlaceInformation(currentPosition, meter);
+                        }
+                    });
+
+
+            dialog.create();
+            dialog.show();
         }
     });
 }
@@ -545,7 +565,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     }
 }
 
-    public void showPlaceInformation(LatLng location)
+    public void showPlaceInformation(LatLng location, int x)
     {
         mMap.clear();//지도 클리어
 
@@ -554,9 +574,9 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         new NRPlaces.Builder()
                 .listener(MapsActivity.this)
-                .key("AIzaSyAynHN-3YCQHZKIegdqdtDIlOsbD_GSRpg")
+                .key("AIzaSyC3x0zqZbCH6DmEXjq7OjH-LscV1RvDgow")
                 .latlng(location.latitude, location.longitude)//현재 위치
-                .radius(2000) //2000미터
+                .radius(x) //사용자가 선택한 거리
                 .type(PlaceType.DENTIST) //치과
                 .build()
                 .execute();

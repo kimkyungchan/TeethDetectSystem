@@ -58,6 +58,7 @@ protected void onCreate(Bundle savedInstanceState) {
             String tinyYoloWeights = Environment.getExternalStorageDirectory() + "/dnns/6000.weights";
 
             tinyYolo = Dnn.readNetFromDarknet(tinyYoloCfg, tinyYoloWeights);
+
         }
     } else {
         startYolo = false;
@@ -92,7 +93,7 @@ public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
         Imgproc.cvtColor(frame, frame, Imgproc.COLOR_RGBA2RGB);
 
-        Mat imageBlob = Dnn.blobFromImage(frame, 0.00392, new Size(416, 416), new Scalar(0, 0, 0));
+        Mat imageBlob = Dnn.blobFromImage(frame, 0.00392, new Size(320, 320), new Scalar(0, 0, 0));
 
         tinyYolo.setInput(imageBlob);
 
@@ -176,7 +177,6 @@ public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
 
             }
         }
-
     }
     return frame;
 }

@@ -39,11 +39,11 @@ public class HomeFragment extends Fragment {
         adapter = new HomeAdapter(MovieCase.TOP);
         home_RecyclerView.setAdapter(adapter);
 
-        Home_ItemData data = new Home_ItemData(R.drawable.ic_baseline_file_upload_24, "핸드폰 라이트를 켠후 왼쪽과같이 촬영", "옆으로 미시오");
+        Home_ItemData data = new Home_ItemData(R.drawable.ic_baseline_file_upload_24, "구현중", "옆으로 미시오");
         adapter.addItem(data);
-        data = new Home_ItemData(R.drawable.ex1, "스파이더맨","옆으로 미시오");
+        data = new Home_ItemData(R.drawable.ex1, "구현중","옆으로 미시오");
         adapter.addItem(data);
-        data = new Home_ItemData(R.drawable.ex2, "스파이더맨","옆으로 미시오");
+        data = new Home_ItemData(R.drawable.ex2, "구현중","옆으로 미시오");
         adapter.addItem(data);
 
         //교육용 가이드
@@ -53,9 +53,9 @@ public class HomeFragment extends Fragment {
         adapter2 = new HomeAdapter(MovieCase.DOWN);
         home_RecyclerView2.setAdapter(adapter2);
 
-        Home_ItemData data2 = new Home_ItemData(R.drawable.ex1, "dddd", "옆으로 미시오");
+        Home_ItemData data2 = new Home_ItemData(R.drawable.ex1, "구현중", "옆으로 미시오");
         adapter2.addItem(data2);
-        data2 = new Home_ItemData(R.drawable.ex2, "aaaaaa","옆으로 미시오");
+        data2 = new Home_ItemData(R.drawable.ex2, "구현중","옆으로 미시오");
         adapter2.addItem(data2);
 
         return v;

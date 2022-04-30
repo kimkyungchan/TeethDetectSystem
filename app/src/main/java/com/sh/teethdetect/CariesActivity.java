@@ -1,3 +1,4 @@
+/*
 package com.sh.teethdetect;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -332,3 +333,4 @@ public void onBackPressed() {
 }
 
 }
+*/

@@ -58,7 +58,7 @@ public class Splash extends Activity {
                         waited += 100;
                     }
                     //Intent intent = new Intent(Splashscreen.this, MainActivity.class);
-                    Intent intent = new Intent(Splash.this, LoginActivity.class);
+                    Intent intent = new Intent(Splash.this, HomeActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
                     startActivity(intent);
                     Splash.this.finish();

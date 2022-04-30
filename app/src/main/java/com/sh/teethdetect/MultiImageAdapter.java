@@ -32,6 +32,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     ImageView dataimage;
     TextView datainfo;
     TextView datadetect;
+    TextView detect;
 
 
     ViewHolder(View itemView) {
@@ -40,6 +41,8 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         dataimage = itemView.findViewById(R.id.teethimageview);
         datainfo = itemView.findViewById(R.id.teethInfoText);
         datadetect= itemView.findViewById(R.id.teethDetectText);
+        detect = itemView.findViewById(R.id.teethDetect2);
+
     }
 }
 
@@ -50,7 +53,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
 public MultiImageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     Context context = parent.getContext() ;
     LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;    // context에서 LayoutInflater 객체를 얻는다.
-    View view = inflater.inflate(R.layout.multi_image_item, parent, false) ;	// 리사이클러뷰에 들어갈 아이템뷰의 레이아웃을 inflate.
+    View view = inflater.inflate(R.layout.multi_image_item, parent, false) ;   // 리사이클러뷰에 들어갈 아이템뷰의 레이아웃을 inflate.
     MultiImageAdapter.ViewHolder vh = new MultiImageAdapter.ViewHolder(view) ;
     return vh ;
 }
@@ -59,11 +62,12 @@ public MultiImageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int vie
 // onBindViewHolder() - position에 해당하는 데이터를 뷰홀더의 아이템뷰에 표시.
 @Override
 public void onBindViewHolder(MultiImageAdapter.ViewHolder holder, int position) {
-   ItemData item = itemData.get(position);
-   
-   holder.dataimage.setImageBitmap(item.getDataImage());
-   holder.datainfo.setText("충치개수 : "+item.getDatainfo());
-   holder.datadetect.setText(item.getDatapercent());
+    ItemData item = itemData.get(position);
+
+    holder.dataimage.setImageBitmap(item.getDataImage());
+    holder.datainfo.setText("충치개수 : "+item.getDatainfo());
+    holder.datadetect.setText(item.getDatapercent());
+    holder.detect.setText(item.getDetect());
 }
 
 // getItemCount() - 전체 데이터 갯수 리턴.

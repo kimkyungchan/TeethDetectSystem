@@ -26,6 +26,7 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container,
     //로그인한 아이디 값 저장 변수
     String userEmail = bundle.getString("passEmail");
 
+
     MyInfoChageBt.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -38,7 +39,7 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container,
     LogOutBt.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(getActivity(),LoginActivity.class);
+            Intent intent = new Intent(getActivity(),HomeActivity.class);
             startActivity(intent);
         }
     });

@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -55,6 +56,19 @@ MultiImageAdapter adapter = new MultiImageAdapter(datalist);
 CariesFragment cariesFragment;
 HomeFragment homeFragment;
 MyPageFragment mypagefragment;
+MyPageNoFragment mypagenofragment;
+private long backKeyPressedTime = 0; //뒤로가기 버튼 눌렀던 시간 저장
+private Toast toast;//첫번째 뒤로가기 버튼을 누를때 표시하는 변수
+static final int PERMISSIONS_REQUEST = 0x00000001;
+
+private String[] PERMISSIONS = {
+        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.CAMERA,
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+        Manifest.permission.MANAGE_EXTERNAL_STORAGE
+};
 
 @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -97,9 +111,8 @@ protected void onCreate(Bundle savedInstanceState) {
                     Bundle bundle =new Bundle();
                     bundle.putString("userEmail",userEmail);
                     cariesFragment.setArguments(bundle);
-
-
                     break;
+
                 case R.id.item_fragment2:
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,new VideoWindowsActivityFragment()).commit();
                     break;
@@ -107,11 +120,21 @@ protected void onCreate(Bundle savedInstanceState) {
                     getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,new MapsFragment()).commit();
                     break;
                 case R.id.item_fragment4:
-                    mypagefragment = new MyPageFragment();
-                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,mypagefragment).commit();
-                    Bundle bundle1 =new Bundle();
-                    bundle1.putString("userEmail",userEmail);
-                    mypagefragment.setArguments(bundle1);
+
+                    if(userEmail==null){
+                        mypagenofragment = new MyPageNoFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,mypagenofragment).commit();
+                    }
+
+                    else{
+
+                        mypagefragment = new MyPageFragment();
+                        getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,mypagefragment).commit();
+                        Bundle bundle1 =new Bundle();
+                        bundle1.putString("userEmail",userEmail);
+                        mypagefragment.setArguments(bundle1);
+
+                    }
 
                     break;
             }
@@ -128,6 +151,7 @@ protected void onCreate(Bundle savedInstanceState) {
         transaction.commit();
 
     }
+
 @Override
 protected void onResume() {
     super.onResume();
@@ -155,5 +179,23 @@ protected void onDestroy() {
     if (cameraBridgeViewBase != null) {
         cameraBridgeViewBase.disableView();
     }
+}
+/* 뒤로가기 버튼 메소드*/
+public void onBackPressed(){
+    //super.onBackPressed();
+    //기존의 뒤로가기 버튼 기능 막기
+    if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
+        backKeyPressedTime = System.currentTimeMillis();
+        toast = Toast.makeText(this, "뒤로 버튼 한번더 누르시면 종료됩니다", Toast.LENGTH_SHORT);
+        toast.show();
+        return;
+    }// 뒤로가기버튼을 한번누르면 현재시간값에 현재버튼누른시간 저장
+    if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+        moveTaskToBack(true);						// 태스크를 백그라운드로 이동
+        finishAndRemoveTask();						// 액티비티 종료 + 태스크 리스트에서 지우기
+        android.os.Process.killProcess(android.os.Process.myPid());
+       // finish();
+       // toast.cancel();
+    }//위에서 저장한 현재시간값에 2초안에 버튼을 한번 더 누르면 앱을 종료함.
 }
 }

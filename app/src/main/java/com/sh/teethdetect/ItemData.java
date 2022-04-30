@@ -1,19 +1,19 @@
 package com.sh.teethdetect;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
 
 public class ItemData {
 Bitmap dataimage;// 충치사진
 String datainfo; // 충치인덱스
-String visittext; // 병원방문텍스트
+String visittext; // 병원방문텍스
+String detect;
 
-public ItemData(Bitmap dataimage, String datainfo, String visittext) {
+public ItemData(Bitmap dataimage, String datainfo, String visittext, String detect) {
 
     this.dataimage = dataimage;
     this.datainfo = datainfo;
     this.visittext = visittext;
+    this.detect = detect;
 
 }
 
@@ -43,6 +43,12 @@ public void setDatapercent(String visittext) {
     this.visittext = visittext;
 }
 
+public String getDetect(){
+    return detect;
+}
+public void setDetect(String detect){
+    this.detect = detect;
+}
 
 
 }

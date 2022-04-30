@@ -1,5 +1,6 @@
 package com.sh.teethdetect;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -49,6 +50,7 @@ import org.opencv.utils.Converters;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,7 +72,11 @@ public class CariesFragment extends Fragment {
     boolean firstTimeYolo = false;
     Net tinyYolo;
 
-    private static final int CARIES_REQUEST = 0;
+    int max = 0;
+    String detect1;
+
+    private static final int CARIES_REQUEST = 0, CARIES_REQUEST1=1; //회원일때 응답코드는 0, 비회원 1
+
     private ImageView imageView2;
     private Button pictureGet;
 
@@ -81,7 +87,9 @@ public class CariesFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_caries, container, false);
 
-        Toast.makeText(getActivity().getApplicationContext(),"과거 검진 리스트를 불러오는 중입니다(10초가량소요) 과거 검진이력이 없으면 불러오지않습니다.",Toast.LENGTH_SHORT).show();
+        pictureGet = v.findViewById(R.id.pictureGet);
+        RecyclerView = v.findViewById(R.id.Recyclerview);
+
         baseLoaderCallback = new BaseLoaderCallback(getActivity()) {
             @Override
             public void onManagerConnected(int status) {
@@ -99,97 +107,107 @@ public class CariesFragment extends Fragment {
             }
         };
 
+        if (startYolo == false) {
+
+            startYolo = true;
+
+            if (firstTimeYolo == false) {
+
+                firstTimeYolo = true;
+                String tinyYoloCfg = Environment.getExternalStorageDirectory() + "/dnns/teeth-train-yolo.cfg";
+                String tinyYoloWeights = Environment.getExternalStorageDirectory() + "/dnns/6000.weights";
+
+                tinyYolo = Dnn.readNetFromDarknet(tinyYoloCfg, tinyYoloWeights);
+            }
+        } else {
+            startYolo = false;
+        }
+
         Bundle bundle = getArguments();
         //로그인한 아이디 값 저장 변수
         String userEmail = bundle.getString("userEmail");
 
-        //caries프래그먼트가 실행이되면 서버에서 이미지경로를 가져와서 set해줘야함
-        Response.Listener<String> responseListener = new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
+        //bunble로 가져온 글자가 존재안하면 비회원처리
+        if(userEmail==null){
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+            dialog.setTitle("비회원이므로 검진결과는 저장되지 않습니다.").setPositiveButton("확인",null);
+            dialog.create();
+            dialog.show();
 
-                try {
+            pictureGet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                    if (startYolo == false) {
-
-                        startYolo = true;
-
-                        if (firstTimeYolo == false) {
-
-                            firstTimeYolo = true;
-                            String tinyYoloCfg = Environment.getExternalStorageDirectory() + "/dnns/teeth-train-yolo.cfg";
-                            String tinyYoloWeights = Environment.getExternalStorageDirectory() + "/dnns/6000.weights";
-
-                            tinyYolo = Dnn.readNetFromDarknet(tinyYoloCfg, tinyYoloWeights);
-                        }
-                    } else {
-                        startYolo = false;
-                    }
-
-                    JSONObject jsonObject = new JSONObject(response);
-                    JSONArray jsonArray = jsonObject.getJSONArray("res");
-
-                    for(int i=0; i<jsonArray.length(); i++){
-                        JSONObject c = jsonArray.getJSONObject(i);
-                        String a = c.getString("UserImage");
-
-                        Log.e("받아지냐 시발 받아졌다",a);
-                        File imgFile = new  File(a);
-                        if(imgFile.exists()){
-                            myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                        }
-                        getOpenCv(myBitmap);
-                    }
-
-
-                } catch (JSONException e) {
-                    Toast.makeText(getActivity().getApplicationContext(),"예외 (에러처리)",Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    startActivityForResult(intent, CARIES_REQUEST1);
                 }
+            });
+
+        }
+
+        //bundle로 가져온 글자가 존재하면 회원처리
+        else{
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+            dialog.setTitle("이전충치검진결과 불러오는 중.\n없으면 확인 눌러주세요").setPositiveButton("확인",null);
+            dialog.create();
+            dialog.show();
+
+            //caries프래그먼트가 실행이되면 서버에서 이미지경로를 가져와서 set해줘야함
+            Response.Listener<String> responseListener = new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+
+                    try {
+
+                        JSONObject jsonObject = new JSONObject(response);
+                        JSONArray jsonArray = jsonObject.getJSONArray("res");
+
+                        for(int i=0; i<jsonArray.length(); i++){
+                            JSONObject c = jsonArray.getJSONObject(i);
+                            String a = c.getString("UserImage");
+
+                            Log.e("받아지냐 시발 받아졌다",a);
+                            File imgFile = new  File(a);
+
+                            if(imgFile.exists()){
+
+                                myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                                getOpenCv(myBitmap);
+                            }
+                            else{
+                                Toast.makeText(getActivity().getApplicationContext(),"기기에서 파일이 삭제되어서 불러올 수 없습니다.",Toast.LENGTH_SHORT).show();
+                            }
+
+                        }
 
 
-            }
-        };
-
-        DatabaseDownRequest databaseDownRequest = new DatabaseDownRequest(userEmail, responseListener );
-        RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
-        queue.add( databaseDownRequest );
-
-
-        // 사진가져오기버튼 구현
-        pictureGet = v.findViewById(R.id.pictureGet);
-        RecyclerView = v.findViewById(R.id.Recyclerview);
-
-        adapter.notifyDataSetChanged();
-
-        pictureGet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                if (startYolo == false) {
-
-                    startYolo = true;
-
-                    if (firstTimeYolo == false) {
-
-                        firstTimeYolo = true;
-                        String tinyYoloCfg = Environment.getExternalStorageDirectory() + "/dnns/teeth-train-yolo.cfg";
-                        String tinyYoloWeights = Environment.getExternalStorageDirectory() + "/dnns/6000.weights";
-
-                        tinyYolo = Dnn.readNetFromDarknet(tinyYoloCfg, tinyYoloWeights);
+                    } catch (JSONException e) {
+                        Toast.makeText(getActivity().getApplicationContext(),"예외 (에러처리)",Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
                     }
-                } else {
-                    startYolo = false;
+
+
                 }
+            };
 
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                startActivityForResult(intent, CARIES_REQUEST);
-            }
-        });
+            DatabaseDownRequest databaseDownRequest = new DatabaseDownRequest(userEmail, responseListener );
+            RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
+            queue.add( databaseDownRequest );
 
+            pictureGet.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.setType("image/*");
+                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                    startActivityForResult(intent, CARIES_REQUEST);
+                }
+            });
+        }
 
         return v;
     } //oncreateview
@@ -205,8 +223,8 @@ public class CariesFragment extends Fragment {
         String userEmail = bundle.getString("userEmail");
 
 
-
         try {
+            //회원
             if (requestCode == CARIES_REQUEST) {
                 if (data == null) {   // 어떤 이미지도 선택하지 않은 경우
                     Toast.makeText(getActivity().getApplicationContext(), "이미지를 선택하지 않았습니다.", Toast.LENGTH_LONG).show();
@@ -225,6 +243,10 @@ public class CariesFragment extends Fragment {
                        // Bitmap bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), ImageUri);
                        // String ImageUritoString = BitmapToString(bitmap);
 
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                        dialog.setTitle("이전 검진결과를 불러오는 중 입니다.\n");
+                        dialog.create();
+                        dialog.show();
 
 
                         Response.Listener<String> responseListener = new Response.Listener<String>() {
@@ -284,8 +306,28 @@ public class CariesFragment extends Fragment {
                     }
                 }
             }
+
+            //비회원코드
+            if (requestCode == CARIES_REQUEST1){
+                if (data == null) {   // 어떤 이미지도 선택하지 않은 경우
+                    Toast.makeText(getActivity().getApplicationContext(), "이미지를 선택하지 않았습니다.", Toast.LENGTH_LONG).show();
+                } else {   // 이미지를 하나라도 선택한 경우
+                    if (data.getClipData() == null) {     // 이미지를 하나만 선택한 경우
+                        Log.e("single choice: ", String.valueOf(data.getData()));
+                        InputStream in = getActivity().getContentResolver().openInputStream(data.getData());
+                        Bitmap img = BitmapFactory.decodeStream(in);
+                        in.close();
+
+                        getOpenCv(img);
+                    }
+                }
+            }
+
+
         } catch (Exception e) {}
     }
+
+
     @Override
     public void onResume() {
         super.onResume();
@@ -363,10 +405,10 @@ private String getRealPathFromURI(Uri contentUri) {
 
 
         private void getOpenCv(Bitmap bitmap){
-
-            String visittext = "정상 치아일 확률이 높습니다. 주기적으로 치아검진은 필수입니다";
-            String visittext2= "충치로 의심되는 부분이 있습니다. 치과 방문을 권장합니다.";
-            String visittext3= "충치로 의심되는 부분이 너무 많습니다. 빠른 시일내에 치과 방문을 권장합니다.";
+            Toast.makeText(getActivity().getApplicationContext(),"과거 검진 리스트를 불러오는 중입니다(10초가량소요) 과거 검진이력이 없으면 불러오지않습니다.",Toast.LENGTH_SHORT).show();
+            String visittext = "검진결과 충치확률이 50% 이상입니다. 치과방문을 권장합니다. ";
+            String visittext2= "충치 확률이 절반 이하이지만, 정확한 검진을 위해 치과 방문을 권장합니다.";
+            String visittext3= "인공지능이 충치를 발견하지 못하였습니다.(정상치아)";
 
             Mat image1 = new Mat();
 
@@ -444,6 +486,10 @@ private String getRealPathFromURI(Uri contentUri) {
                 // Draw result boxes:
                 int[] ind = indices.toArray();
 
+                String detect[];
+                detect = new String[ind.length];
+                int[] intConf = new int[ind.length];
+
                 for (int i = 0; i < ind.length; ++i) {
 
                     indlength=(i+1);
@@ -457,13 +503,22 @@ private String getRealPathFromURI(Uri contentUri) {
 
                     List<String> cocoNames = Arrays.asList("caries");
 
-                    int intConf = (int) (conf * 100);
+                    intConf[i] = (int) (conf * 100);
 
-                    Imgproc.putText(image1,  intConf + "%", box.tl(), Core.FONT_HERSHEY_SIMPLEX, 2, new Scalar(0, 255, 0), 3);
+                    Imgproc.putText(image1,"No."+ (i+1), box.tl(), Core.FONT_HERSHEY_SIMPLEX, 2, new Scalar(0, 0, 255), 3);
                     Imgproc.rectangle(image1, box.tl(), box.br(), new Scalar(255, 0, 0), 5);
+
+                    detect[i]=(i+1)+"번째 치아의 충치 확률 : "+intConf[i]+"%";
+                    Log.e("sssss",detect[i]);
+                    detect1 = Arrays.toString(detect);
+
+                    if(intConf[i]>max){
+                        max = intConf[i];
+                    }
 
                 }
             }
+
             //cv처리된 비트맵 이미지
             Bitmap setimg = Bitmap.createBitmap(image1.cols(),image1.rows(),null);
             Utils.matToBitmap(image1,setimg);
@@ -471,10 +526,22 @@ private String getRealPathFromURI(Uri contentUri) {
             Toast.makeText(getActivity().getApplicationContext(),"충치 검진 결과를 확인하세요.",Toast.LENGTH_SHORT).show();
             // 데이터베이스 주기 위한 서버 동작
             cariesnumber = String.valueOf(indlength);
-            //String bitstring = BitmapToString(setimg);
-            //String setimgstringutf = URLEncoder.encode(bitstring,"utf-8");
+            if(indlength > 0 && max >= 50){
+                datalist.add(new ItemData(setimg,cariesnumber,visittext,detect1));
+                Log.e("씨발",detect1);
+                indlength = 0;
+                max = 0;
 
-            datalist.add(new ItemData(setimg,cariesnumber,visittext));
+            } else if(indlength > 0 && max < 50 && max > 0){
+                datalist.add(new ItemData(setimg,cariesnumber,visittext2,detect1));
+                Log.e("씨발",detect1);
+                indlength = 0;
+                max = 0;
+            } else if(indlength <= 0){
+                datalist.add(new ItemData(setimg,cariesnumber,visittext3,"　"));
+                indlength=0;
+            }
+
             RecyclerView.setAdapter(adapter);
             RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
             adapter.notifyDataSetChanged();
