@@ -28,7 +28,7 @@ MultiImageAdapter(ArrayList<ItemData>itemData) {
 
 // 아이템 뷰를 저장하는 뷰홀더 클래스.
 public class ViewHolder extends RecyclerView.ViewHolder {
-
+    TextView datatime;
     ImageView dataimage;
     TextView datainfo;
     TextView datadetect;
@@ -38,6 +38,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     ViewHolder(View itemView) {
         super(itemView) ;
         // 뷰 객체에 대한 참조.
+        datatime = itemView.findViewById(R.id.teethtime);
         dataimage = itemView.findViewById(R.id.teethimageview);
         datainfo = itemView.findViewById(R.id.teethInfoText);
         datadetect= itemView.findViewById(R.id.teethDetectText);
@@ -64,6 +65,7 @@ public MultiImageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int vie
 public void onBindViewHolder(MultiImageAdapter.ViewHolder holder, int position) {
     ItemData item = itemData.get(position);
 
+    holder.datatime.setText("검진시각:"+item.getCurrentTime());
     holder.dataimage.setImageBitmap(item.getDataImage());
     holder.datainfo.setText("충치개수 : "+item.getDatainfo());
     holder.datadetect.setText(item.getDatapercent());

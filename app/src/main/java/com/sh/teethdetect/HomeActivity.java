@@ -3,20 +3,13 @@ package com.sh.teethdetect;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -24,25 +17,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.MatOfRect;
-import org.opencv.core.Point;
-import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.dnn.Dnn;
 import org.opencv.dnn.Net;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.utils.Converters;
 
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -79,7 +56,6 @@ protected void onCreate(Bundle savedInstanceState) {
     bottomNavigationView = findViewById(R.id.navi_bar);
 
     OnCheckPermission();
-
     homeFragment = new HomeFragment();
     setDefaultFragment();
 
@@ -103,9 +79,9 @@ protected void onCreate(Bundle savedInstanceState) {
         }
     };
 
-    bottomNavigationView.setOnNavigationItemReselectedListener(new BottomNavigationView.OnNavigationItemReselectedListener() {
+    bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
-        public void onNavigationItemReselected(@NonNull MenuItem menuItem) {
+        public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
             switch (menuItem.getItemId()){
                 case R.id.item_fragment1:
@@ -142,19 +118,19 @@ protected void onCreate(Bundle savedInstanceState) {
 
                     break;
             }
-            return;
+            return true;
         }
     });
 
 
 }
 
-    public void setDefaultFragment(){
+public void setDefaultFragment(){
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.main_frame, homeFragment);
         transaction.commit();
 
-    }
+}
 
 @Override
 protected void onResume() {

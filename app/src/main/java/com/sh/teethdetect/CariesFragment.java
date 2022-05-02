@@ -51,8 +51,10 @@ import org.opencv.utils.Converters;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 
@@ -71,6 +73,8 @@ public class CariesFragment extends Fragment {
     boolean startYolo = false;
     boolean firstTimeYolo = false;
     Net tinyYolo;
+
+    String CurrentTime = "검진시각없음"; // 검진시각저장변수
 
     int max = 0;
     String detect1;
@@ -168,6 +172,7 @@ public class CariesFragment extends Fragment {
                         for(int i=0; i<jsonArray.length(); i++){
                             JSONObject c = jsonArray.getJSONObject(i);
                             String a = c.getString("UserImage");
+                            String CurrentTime = c.getString("CurrentTime");
 
                             Log.e("받아지냐 시발 받아졌다",a);
                             File imgFile = new  File(a);
@@ -175,7 +180,7 @@ public class CariesFragment extends Fragment {
                             if(imgFile.exists()){
 
                                 myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                                getOpenCv(myBitmap);
+                                getOpenCv(myBitmap,CurrentTime);
                             }
                             else{
                                 Toast.makeText(getActivity().getApplicationContext(),"기기에서 파일이 삭제되어서 불러올 수 없습니다.",Toast.LENGTH_SHORT).show();
@@ -232,6 +237,8 @@ public class CariesFragment extends Fragment {
                     if (data.getClipData() == null) {     // 이미지를 하나만 선택한 경우
                         Log.e("single choice: ", String.valueOf(data.getData()));
 
+                        String CurrentTime = getTime();//현재시간저장 변수
+
 
                         /*InputStream in = getActivity().getContentResolver().openInputStream(data.getData());
                         Bitmap img = BitmapFactory.decodeStream(in);
@@ -261,6 +268,7 @@ public class CariesFragment extends Fragment {
                                     if(success.equals("true")) {
 
                                         String a = jsonObject.getString("UserImage");
+                                        String CurrentTime = jsonObject.getString("CurrentTime");
 
                                         Uri uri = Uri.parse(a);
                                         Thread.sleep(1000);
@@ -281,7 +289,7 @@ public class CariesFragment extends Fragment {
 
                                         // --
 
-                                        getOpenCv(myBitmap);
+                                        getOpenCv(myBitmap,CurrentTime);
 
 
                                     } else {
@@ -299,7 +307,7 @@ public class CariesFragment extends Fragment {
                             }
                         };
 
-                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail, realuri, responseListener );
+                            DatabaseRequest databaseRequest = new DatabaseRequest(userEmail, realuri, CurrentTime, responseListener );
                             RequestQueue queue = Volley.newRequestQueue( getActivity().getApplicationContext());
                             queue.add( databaseRequest );
 
@@ -317,8 +325,8 @@ public class CariesFragment extends Fragment {
                         InputStream in = getActivity().getContentResolver().openInputStream(data.getData());
                         Bitmap img = BitmapFactory.decodeStream(in);
                         in.close();
-
-                        getOpenCv(img);
+                        String CurrentTime = "비회원은 검진시각 제공 x";
+                        getOpenCv(img,CurrentTime);
                     }
                 }
             }
@@ -404,7 +412,7 @@ private String getRealPathFromURI(Uri contentUri) {
         finally { cursor.close(); } return null; }
 
 
-        private void getOpenCv(Bitmap bitmap){
+        private void getOpenCv(Bitmap bitmap,String CurrentTime){
             Toast.makeText(getActivity().getApplicationContext(),"과거 검진 리스트를 불러오는 중입니다(10초가량소요) 과거 검진이력이 없으면 불러오지않습니다.",Toast.LENGTH_SHORT).show();
             String visittext = "검진결과 충치확률이 50% 이상입니다. 치과방문을 권장합니다. ";
             String visittext2= "충치 확률이 절반 이하이지만, 정확한 검진을 위해 치과 방문을 권장합니다.";
@@ -510,7 +518,9 @@ private String getRealPathFromURI(Uri contentUri) {
 
                     detect[i]=(i+1)+"번째 치아의 충치 확률 : "+intConf[i]+"%";
                     Log.e("sssss",detect[i]);
+                    // 검진퍼센트메시지출력
                     detect1 = Arrays.toString(detect);
+
 
                     if(intConf[i]>max){
                         max = intConf[i];
@@ -525,20 +535,21 @@ private String getRealPathFromURI(Uri contentUri) {
 
             Toast.makeText(getActivity().getApplicationContext(),"충치 검진 결과를 확인하세요.",Toast.LENGTH_SHORT).show();
             // 데이터베이스 주기 위한 서버 동작
+
             cariesnumber = String.valueOf(indlength);
             if(indlength > 0 && max >= 50){
-                datalist.add(new ItemData(setimg,cariesnumber,visittext,detect1));
+                datalist.add(new ItemData(CurrentTime,setimg,cariesnumber,visittext,detect1));
                 Log.e("씨발",detect1);
                 indlength = 0;
                 max = 0;
 
             } else if(indlength > 0 && max < 50 && max > 0){
-                datalist.add(new ItemData(setimg,cariesnumber,visittext2,detect1));
+                datalist.add(new ItemData(CurrentTime,setimg,cariesnumber,visittext2,detect1));
                 Log.e("씨발",detect1);
                 indlength = 0;
                 max = 0;
             } else if(indlength <= 0){
-                datalist.add(new ItemData(setimg,cariesnumber,visittext3,"　"));
+                datalist.add(new ItemData(CurrentTime,setimg,cariesnumber,visittext3,"　"));
                 indlength=0;
             }
 
@@ -546,6 +557,15 @@ private String getRealPathFromURI(Uri contentUri) {
             RecyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
             adapter.notifyDataSetChanged();
         }
+
+private String getTime() {
+        long now = System.currentTimeMillis();
+Date date = new Date(now);
+SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+String getTime = dateFormat.format(date);
+return getTime;
+    }
+
 
 
 

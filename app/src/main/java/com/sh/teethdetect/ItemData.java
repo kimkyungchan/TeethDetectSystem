@@ -3,13 +3,14 @@ package com.sh.teethdetect;
 import android.graphics.Bitmap;
 
 public class ItemData {
+    String currenttime; // 검진시각
 Bitmap dataimage;// 충치사진
 String datainfo; // 충치인덱스
 String visittext; // 병원방문텍스
 String detect;
 
-public ItemData(Bitmap dataimage, String datainfo, String visittext, String detect) {
-
+public ItemData(String currenttime, Bitmap dataimage, String datainfo, String visittext, String detect) {
+    this.currenttime = currenttime;
     this.dataimage = dataimage;
     this.datainfo = datainfo;
     this.visittext = visittext;
@@ -17,6 +18,13 @@ public ItemData(Bitmap dataimage, String datainfo, String visittext, String dete
 
 }
 
+public String getCurrentTime() {
+    return currenttime;
+}
+
+public void setCurrentTime() {
+    this.currenttime = currenttime;
+}
 
 public Bitmap getDataImage() {
     return dataimage;

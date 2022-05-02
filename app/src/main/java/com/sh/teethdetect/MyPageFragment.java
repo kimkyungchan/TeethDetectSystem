@@ -24,7 +24,8 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container,
 
     Bundle bundle = getArguments();
     //로그인한 아이디 값 저장 변수
-    String userEmail = bundle.getString("passEmail");
+    //홈액티비티에서 번들로 받아온 값
+    String userEmail = bundle.getString("userEmail");
 
 
     MyInfoChageBt.setOnClickListener(new View.OnClickListener() {

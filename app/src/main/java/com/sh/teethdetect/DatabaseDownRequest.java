@@ -11,7 +11,7 @@ public class DatabaseDownRequest extends StringRequest {
 final static private String URL = "http://lsh2952.dothome.co.kr/DataSend.php";
 private Map<String, String> map;
 
-public DatabaseDownRequest(String user, Response.Listener<String> listener) {
+public DatabaseDownRequest(String user,Response.Listener<String> listener) {
     super(Method.POST, URL, listener, null);
 
     map = new HashMap<>();
