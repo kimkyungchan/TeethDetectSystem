@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/CariesDialogImage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ex3" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/CariesDialogText"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/CariesDialogImage"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/CariesDialogImage"
+                android:text="좌측처럼 사진을 미리 찍어주세요."
+                android:textColor="#000"
+                android:layout_weight="0.9"/>
+
+            <Button
+                android:id="@+id/CariesDialogButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="확인"
+                android:layout_weight="0.1"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

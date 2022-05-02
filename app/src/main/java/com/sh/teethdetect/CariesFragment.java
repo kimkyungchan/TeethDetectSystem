@@ -1,6 +1,7 @@
 package com.sh.teethdetect;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -73,7 +74,7 @@ public class CariesFragment extends Fragment {
     boolean startYolo = false;
     boolean firstTimeYolo = false;
     Net tinyYolo;
-
+    Dialog dialog1;
     String CurrentTime = "검진시각없음"; // 검진시각저장변수
 
     int max = 0;
@@ -82,7 +83,7 @@ public class CariesFragment extends Fragment {
     private static final int CARIES_REQUEST = 0, CARIES_REQUEST1=1; //회원일때 응답코드는 0, 비회원 1
 
     private ImageView imageView2;
-    private Button pictureGet;
+    private Button pictureGet,Dialogbtn;
 
 
     @Override
@@ -142,10 +143,7 @@ public class CariesFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
 
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("image/*");
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    startActivityForResult(intent, CARIES_REQUEST1);
+                    ShowDialog1();
                 }
             });
 
@@ -206,10 +204,7 @@ public class CariesFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
 
-                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    intent.setType("image/*");
-                    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                    startActivityForResult(intent, CARIES_REQUEST);
+                  ShowDialog2();
                 }
             });
         }
@@ -566,7 +561,45 @@ String getTime = dateFormat.format(date);
 return getTime;
     }
 
+//다이얼로그 함수
+public void ShowDialog1(){
+    dialog1 = new Dialog(getActivity());
+    dialog1.setContentView(R.layout.cariesdialog);
+    dialog1.show();
 
+    Dialogbtn = dialog1.findViewById(R.id.CariesDialogButton);
+    Dialogbtn.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            startActivityForResult(intent, CARIES_REQUEST1);
+            dialog1.dismiss();
+        }
+    });
+}
+
+//다이얼로그 함수
+public void ShowDialog2(){
+    dialog1 = new Dialog(getActivity());
+    dialog1.setContentView(R.layout.cariesdialog);
+    dialog1.show();
+
+    Dialogbtn = dialog1.findViewById(R.id.CariesDialogButton);
+    Dialogbtn.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            startActivityForResult(intent, CARIES_REQUEST);
+            dialog1.dismiss();
+        }
+    });
+}
 
 
 }
