@@ -59,6 +59,7 @@ protected void onCreate(Bundle savedInstanceState) {
                             if(success.equals("true")) {//서버에서 true를 받으면
                                 Toast.makeText( getApplicationContext(), "비밀번호 변경 성공", Toast.LENGTH_SHORT ).show();
                                 startActivity(gologin);
+                                finish();
                             }
 
                         } catch (JSONException e) {
@@ -111,6 +112,7 @@ protected void onCreate(Bundle savedInstanceState) {
                             if(success.equals("true")) {//서버에서 true를 받으면
                                 Toast.makeText( getApplicationContext(), "회원탈퇴 성공", Toast.LENGTH_SHORT ).show();
                                 startActivity(gohome);
+                                finish();
                             }
 
                         } catch (JSONException e) {

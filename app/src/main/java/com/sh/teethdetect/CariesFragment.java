@@ -153,7 +153,7 @@ public class CariesFragment extends Fragment {
         else{
 
             AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-            dialog.setTitle("이전충치검진결과 불러오는 중.\n없으면 확인 눌러주세요").setPositiveButton("확인",null);
+            dialog.setTitle("충치검진결과 불러오는 중 (리스트가 불러와지면 닫기누르기)").setPositiveButton("닫기",null);
             dialog.create();
             dialog.show();
 
@@ -231,8 +231,9 @@ public class CariesFragment extends Fragment {
                 intent.putExtra("Num",num);
                 intent.putExtra("Index",index);
                 intent.putExtra("Visit",visit);
-
+                intent.putExtra("UserEmail",userEmail);
                 startActivity(intent);
+                getActivity().finish();
             }
         });
 

@@ -2,6 +2,8 @@ package com.sh.teethdetect;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +16,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.Utils;
 import org.opencv.core.Core;
@@ -90,7 +98,7 @@ protected void onCreate(Bundle savedInstanceState) {
     text3 = findViewById(R.id.text3);
     text4 = findViewById(R.id.text4);
 
-    String t1,t2,t3,t4,uri;
+    String t1,t2,t3,t4,uri,userEmail;
 
     Intent intent = getIntent();
 
@@ -99,6 +107,11 @@ protected void onCreate(Bundle savedInstanceState) {
     t2 = intent.getStringExtra("Num");
     t3 = intent.getStringExtra("Index");
     t4 = intent.getStringExtra("Visit");
+    userEmail = intent.getStringExtra("UserEmail");
+
+    if(userEmail==null){
+        delete.setEnabled(false);
+    }
 
     File imgFile = new  File(uri);
 
@@ -215,9 +228,50 @@ protected void onCreate(Bundle savedInstanceState) {
     text3.setText("충치인덱스\n"+t3);
     text4.setText("권고사항\n"+t4);
 
+
     delete.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+
+            AlertDialog.Builder dialog = new AlertDialog.Builder(ListClickView.this);
+            dialog.setTitle("삭제하시겠습니까?").setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    Response.Listener<String> responseListener = new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+
+                            try {
+                                JSONObject jsonObject = new JSONObject( response );
+                                String success = jsonObject.getString( "success" );
+
+                                if(success.equals("true")) {//서버에서 true를 받으면
+                                    Toast.makeText( getApplicationContext(), "리스트 삭제 성공", Toast.LENGTH_SHORT ).show();
+                                    Intent gohome = new Intent(ListClickView.this,HomeActivity.class);
+                                    gohome.putExtra("userEmail",userEmail);
+                                    startActivity(gohome);
+                                    finish();
+                                }
+
+                            } catch (JSONException e) {
+                                Toast.makeText(ListClickView.this,"리스트삭제 실패(서버오류)",Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+
+                            }
+                        }
+                    };
+
+                    //volley에 userEmail과 passcheck를 넣어서 MyInfoChangeRequest 통해 php서버로 보내줌.
+                    DeletelistRequest deletelistRequest = new DeletelistRequest( userEmail,uri, responseListener );
+                    RequestQueue queue = Volley.newRequestQueue( ListClickView.this );
+                    queue.add( deletelistRequest );
+
+                }
+            }).setNegativeButton("취소",null);
+            dialog.create();
+            dialog.show();
+
+
 
         }
     });

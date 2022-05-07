@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:src="@drawable/android_image_24dp" />
+            android:src="@drawable/nox" />
     </LinearLayout>
 
     <LinearLayout
@@ -65,6 +65,7 @@
             android:orientation="horizontal"
             android:layout_weight="1">
         <Button
+            android:enabled="true"
             android:id="@+id/delete"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
