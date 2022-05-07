@@ -21,6 +21,20 @@ public class MultiImageAdapter extends RecyclerView.Adapter<MultiImageAdapter.Vi
 private ArrayList<ItemData> itemData;
 //private Context mContext = null ;
 
+public interface OnItemClickListener
+{
+    void onItemClick(View v, int pos);
+}
+
+// 리스너 객체 참조를 저장하는 변수
+private OnItemClickListener mListener = null;
+
+// OnItemClickListener 객체 참조를 어댑터에 전달하는 메서드
+public void setOnItemClickListener(OnItemClickListener listener)
+{
+    this.mListener = listener;
+}
+
 // 생성자에서 데이터 리스트 객체, Context를 전달받음.
 MultiImageAdapter(ArrayList<ItemData>itemData) {
     this.itemData=itemData;
@@ -38,6 +52,17 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     ViewHolder(View itemView) {
         super(itemView) ;
         // 뷰 객체에 대한 참조.
+
+        itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int pos = getAdapterPosition();
+                if(pos!=RecyclerView.NO_POSITION){
+                    mListener.onItemClick(view,pos);
+                }
+            }
+        });
+
         datatime = itemView.findViewById(R.id.teethtime);
         dataimage = itemView.findViewById(R.id.teethimageview);
         datainfo = itemView.findViewById(R.id.teethInfoText);
@@ -64,7 +89,7 @@ public MultiImageAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int vie
 @Override
 public void onBindViewHolder(MultiImageAdapter.ViewHolder holder, int position) {
     ItemData item = itemData.get(position);
-
+    String uri = item.getUri();
     holder.datatime.setText("검진시각:"+item.getCurrentTime());
     holder.dataimage.setImageBitmap(item.getDataImage());
     holder.datainfo.setText("충치개수 : "+item.getDatainfo());

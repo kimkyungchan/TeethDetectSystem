@@ -6,13 +6,19 @@
         android:id="@+id/item_fragment1"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_file_upload_24"
-        android:title="충치검진"/>
+        android:title="사진검진"/>
 
     <item
         android:id="@+id/item_fragment2"
         android:enabled="true"
         android:icon="@drawable/ic_baseline_photo_camera_24"
         android:title="실시간검진"/>
+
+    <item
+        android:id="@+id/item_fragment5"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_home_24"
+        android:title="홈"/>
 
     <item
         android:id="@+id/item_fragment3"
@@ -25,5 +31,7 @@
         android:enabled="true"
         android:icon="@drawable/ic_baseline_contact_mail_24"
         android:title="내정보"/>
+
+
 
 </menu>

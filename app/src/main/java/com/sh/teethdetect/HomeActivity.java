@@ -117,6 +117,11 @@ protected void onCreate(Bundle savedInstanceState) {
                     }
 
                     break;
+
+                case R.id.item_fragment5:
+                    getSupportFragmentManager().beginTransaction().replace(R.id.main_frame,new HomeFragment()).commit();
+                    break;
+
             }
             return true;
         }

@@ -75,7 +75,7 @@ public class CariesFragment extends Fragment {
     boolean firstTimeYolo = false;
     Net tinyYolo;
     Dialog dialog1;
-    String CurrentTime = "검진시각없음"; // 검진시각저장변수
+
 
     int max = 0;
     String detect1;
@@ -178,7 +178,7 @@ public class CariesFragment extends Fragment {
                             if(imgFile.exists()){
 
                                 myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-                                getOpenCv(myBitmap,CurrentTime);
+                                getOpenCv(myBitmap,CurrentTime,a);
                             }
                             else{
                                 Toast.makeText(getActivity().getApplicationContext(),"기기에서 파일이 삭제되어서 불러올 수 없습니다.",Toast.LENGTH_SHORT).show();
@@ -208,6 +208,33 @@ public class CariesFragment extends Fragment {
                 }
             });
         }
+
+        adapter.setOnItemClickListener(new MultiImageAdapter.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(View v, int pos)
+            {
+                // 실행 내용
+                ItemData itemData = datalist.get(pos);
+
+                String uri = itemData.getUri();
+                String data = itemData.getCurrentTime(); //날짜
+                String num = itemData.getDatainfo(); // 충치개수
+                String index = itemData.getDetect(); // 충치인덱스별 퍼센트
+                String visit = itemData.getDatapercent(); // 방문텍스트
+
+
+                Intent intent = new Intent(getActivity(), ListClickView.class);
+
+                intent.putExtra("Uri",uri);
+                intent.putExtra("Date", data);
+                intent.putExtra("Num",num);
+                intent.putExtra("Index",index);
+                intent.putExtra("Visit",visit);
+
+                startActivity(intent);
+            }
+        });
 
         return v;
     } //oncreateview
@@ -262,17 +289,16 @@ public class CariesFragment extends Fragment {
 
                                     if(success.equals("true")) {
 
-                                        String a = jsonObject.getString("UserImage");
+                                        String uri = jsonObject.getString("UserImage");
                                         String CurrentTime = jsonObject.getString("CurrentTime");
 
-                                        Uri uri = Uri.parse(a);
                                         Thread.sleep(1000);
                                         //String b=jsonObject.getString("UserCaries");
                                         //Toast.makeText(getActivity().getApplicationContext(),b,Toast.LENGTH_SHORT).show();
                                         //String c=jsonObject.getString("UserText");
                                         //cv 처리
 
-                                        File imgFile = new  File(a);
+                                        File imgFile = new  File(uri);
 
                                         if(imgFile.exists()){
                                             myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
@@ -284,7 +310,7 @@ public class CariesFragment extends Fragment {
 
                                         // --
 
-                                        getOpenCv(myBitmap,CurrentTime);
+                                        getOpenCv(myBitmap,CurrentTime,uri);
 
 
                                     } else {
@@ -321,7 +347,8 @@ public class CariesFragment extends Fragment {
                         Bitmap img = BitmapFactory.decodeStream(in);
                         in.close();
                         String CurrentTime = "비회원은 검진시각 제공 x";
-                        getOpenCv(img,CurrentTime);
+                        String uri = "";
+                        getOpenCv(img,CurrentTime,uri);
                     }
                 }
             }
@@ -407,7 +434,7 @@ private String getRealPathFromURI(Uri contentUri) {
         finally { cursor.close(); } return null; }
 
 
-        private void getOpenCv(Bitmap bitmap,String CurrentTime){
+        private void getOpenCv(Bitmap bitmap,String CurrentTime,String Uri){
             Toast.makeText(getActivity().getApplicationContext(),"과거 검진 리스트를 불러오는 중입니다(10초가량소요) 과거 검진이력이 없으면 불러오지않습니다.",Toast.LENGTH_SHORT).show();
             String visittext = "검진결과 충치확률이 50% 이상입니다. 치과방문을 권장합니다. ";
             String visittext2= "충치 확률이 절반 이하이지만, 정확한 검진을 위해 치과 방문을 권장합니다.";
@@ -533,18 +560,18 @@ private String getRealPathFromURI(Uri contentUri) {
 
             cariesnumber = String.valueOf(indlength);
             if(indlength > 0 && max >= 50){
-                datalist.add(new ItemData(CurrentTime,setimg,cariesnumber,visittext,detect1));
+                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,visittext,detect1));
                 Log.e("씨발",detect1);
                 indlength = 0;
                 max = 0;
 
             } else if(indlength > 0 && max < 50 && max > 0){
-                datalist.add(new ItemData(CurrentTime,setimg,cariesnumber,visittext2,detect1));
+                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,visittext2,detect1));
                 Log.e("씨발",detect1);
                 indlength = 0;
                 max = 0;
             } else if(indlength <= 0){
-                datalist.add(new ItemData(CurrentTime,setimg,cariesnumber,visittext3,"　"));
+                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,visittext3,"　"));
                 indlength=0;
             }
 

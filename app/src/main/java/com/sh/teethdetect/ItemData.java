@@ -8,14 +8,23 @@ Bitmap dataimage;// 충치사진
 String datainfo; // 충치인덱스
 String visittext; // 병원방문텍스
 String detect;
+String uri;
 
-public ItemData(String currenttime, Bitmap dataimage, String datainfo, String visittext, String detect) {
+public ItemData(String uri,String currenttime, Bitmap dataimage, String datainfo, String visittext, String detect) {
+    this.uri=uri;
     this.currenttime = currenttime;
     this.dataimage = dataimage;
     this.datainfo = datainfo;
     this.visittext = visittext;
     this.detect = detect;
 
+}
+public String getUri() {
+    return uri;
+}
+
+public void setUri() {
+    this.uri = uri;
 }
 
 public String getCurrentTime() {
