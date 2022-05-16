@@ -12,8 +12,8 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_gravity="center"
-        android:background="@drawable/android_image_24dp"
-        android:scaleType="fitXY" />
+        android:background="@drawable/teeth_splash"
+        android:scaleType="center" />
 
 
     <TextView

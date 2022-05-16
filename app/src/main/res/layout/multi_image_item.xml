@@ -28,7 +28,7 @@
             android:id="@+id/teethtime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="예시"
+
             android:textAlignment="textStart"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"/>
@@ -61,8 +61,7 @@
             android:textAlignment="textStart"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:text="예시"/>
+            android:layout_marginRight="5dp"/>
 
     </LinearLayout>
 

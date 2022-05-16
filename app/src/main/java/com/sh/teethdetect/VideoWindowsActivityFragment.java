@@ -11,19 +11,21 @@ import androidx.fragment.app.Fragment;
 
 public class VideoWindowsActivityFragment extends Fragment {
 
-Button detectgo;
+Button takepicture;
 @Override
 public View onCreateView(LayoutInflater inflater, ViewGroup container,
                          Bundle savedInstanceState) {
     // Inflate the layout for this fragment
     View v = inflater.inflate(R.layout.fragment_video_windows_activity, container, false);
-    detectgo= v.findViewById(R.id.detectgo);
+    takepicture= v.findViewById(R.id.takepicture);
 
-    detectgo.setOnClickListener(new View.OnClickListener() {
+
+    takepicture.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(getActivity(),VideodetectActivity.class);
-            startActivity(intent);
+            Intent intent1;
+            intent1 = getActivity().getPackageManager().getLaunchIntentForPackage("com.vaultmicro.camerafi2");
+            startActivity(intent1);
         }
     });
     return v;

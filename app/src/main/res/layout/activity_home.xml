@@ -11,7 +11,7 @@
         android:id="@+id/navi_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="#B0E0E6"
         app:itemTextColor="@drawable/menu_selector_color"
         app:itemIconTint="@drawable/menu_selector_color"
         app:menu="@menu/navibar">

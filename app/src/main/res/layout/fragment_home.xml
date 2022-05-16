@@ -9,11 +9,12 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="사용자 가이드 ↓"
+        android:layout_marginTop="45dp"
+        android:text="어플 사용 가이드 ↓"
+        android:textSize="20dp"
         android:layout_gravity="center"
         android:textStyle="bold"
-        android:textColor="@color/black" />
+        android:textColor="@color/black"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/home_Recyclerview"
@@ -22,11 +23,16 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:layout_marginTop="20dp"/>
+    <View
+        android:background="#B0E0E6"
+        android:layout_width="match_parent"
+        android:layout_height="5px"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="교육용 가이드 ↓"
+        android:text="사진 촬영 가이드 ↓"
+        android:textSize="20dp"
         android:layout_gravity="center"
         android:textStyle="bold"
         android:textColor="@color/black" />

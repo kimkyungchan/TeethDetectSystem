@@ -7,12 +7,12 @@
     tools:context=".VideoWindowsActivityFragment">
 
     <Button
-        android:id="@+id/detectgo"
+        android:id="@+id/takepicture"
         android:layout_width="130dp"
         android:layout_height="50dp"
-        android:background="@color/black"
+        android:background="#114067"
         android:textColor="@color/white"
-        android:text="실시간 검진 시작"
+        android:text="사진 찍기"
         android:layout_marginTop="300dp"
         android:layout_gravity="center"/>
 
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="30dp"
-        android:text="버튼을 누르면 외장카메라를 연결하여 충치를 검진할 수 있습니다.\n 기기의 GPU성능에 따라 검진속도가 느려질 수 있습니다"
+        android:text="외장카메라를 연결하거나 \n내장카메라로 치아사진을 메뉴얼대로 찍어주세요."
         android:textColor="@color/black"/>
 
 </LinearLayout>

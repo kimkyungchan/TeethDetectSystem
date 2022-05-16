@@ -83,7 +83,7 @@ public class CariesFragment extends Fragment {
     private static final int CARIES_REQUEST = 0, CARIES_REQUEST1=1; //회원일때 응답코드는 0, 비회원 1
 
     private ImageView imageView2;
-    private Button pictureGet,Dialogbtn;
+    private Button pictureGet,Dialogbtn,videoget;
 
 
     @Override
@@ -94,6 +94,15 @@ public class CariesFragment extends Fragment {
 
         pictureGet = v.findViewById(R.id.pictureGet);
         RecyclerView = v.findViewById(R.id.Recyclerview);
+        videoget = v.findViewById(R.id.VideoGet);
+
+        videoget.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), VideodetectActivity.class);
+                startActivity(intent);
+            }
+        });
 
         baseLoaderCallback = new BaseLoaderCallback(getActivity()) {
             @Override
@@ -180,7 +189,7 @@ public class CariesFragment extends Fragment {
                                 myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
                                 getOpenCv(myBitmap,CurrentTime,a);
                             }
-                            else{
+                            else if(imgFile.exists() == false){
                                 Toast.makeText(getActivity().getApplicationContext(),"기기에서 파일이 삭제되어서 불러올 수 없습니다.",Toast.LENGTH_SHORT).show();
                             }
 
@@ -233,7 +242,7 @@ public class CariesFragment extends Fragment {
                 intent.putExtra("Visit",visit);
                 intent.putExtra("UserEmail",userEmail);
                 startActivity(intent);
-                getActivity().finish();
+                //getActivity().finish(); //돌아와도 프래그먼트 살아있게 하기위해 주석처리
             }
         });
 

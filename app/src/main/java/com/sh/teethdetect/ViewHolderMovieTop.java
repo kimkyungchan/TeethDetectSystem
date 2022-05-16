@@ -16,9 +16,9 @@ public class ViewHolderMovieTop extends HomeItemView {
 
     public ViewHolderMovieTop(@NonNull View itemView) {
         super(itemView);
-        iv_movie = itemView.findViewById(R.id.teethimageview);
-        tv_movie_title = itemView.findViewById(R.id.teethInfoText);
-        tv_movie_title2 = itemView.findViewById(R.id.teethDetectText);
+        iv_movie = itemView.findViewById(R.id.teethimageview3);
+        tv_movie_title = itemView.findViewById(R.id.teethInfoText3);
+        tv_movie_title2 = itemView.findViewById(R.id.teethDetectText3);
     }
 
     public void onBind(HomeItem data){

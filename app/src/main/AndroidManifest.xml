@@ -68,4 +68,7 @@
             android:exported="true"></activity>
     </application>
 
+    <queries>
+    <package android:name="com.vaultmicro.camerafi2" />
+    </queries>
 </manifest>

@@ -14,7 +14,7 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ex3" />
+            android:src="@drawable/warning" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -28,7 +28,7 @@
                 android:layout_alignBottom="@id/CariesDialogImage"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@id/CariesDialogImage"
-                android:text="좌측처럼 사진을 미리 찍어주세요."
+                android:text="치아가 아닌 다른 사진을 선택하면 검진이 되지 않습니다."
                 android:textColor="#000"
                 android:layout_weight="0.9"/>
 

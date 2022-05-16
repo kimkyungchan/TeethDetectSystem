@@ -52,7 +52,12 @@ public class ListClickView extends AppCompatActivity {
     boolean firstTimeYolo = false;
     Net tinyYolo;
     int indlength=0;
+    String userEmail;
     //text1: 날짜 (db) , text2:충치개수 , text3:인덱스 text4:방문텍스트
+
+    private long backKeyPressedTime = 0; //뒤로가기 버튼 눌렀던 시간 저장
+    private Toast toast;//첫번째 뒤로가기 버튼을 누를때 표시하는 변수
+
 @Override
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -98,7 +103,7 @@ protected void onCreate(Bundle savedInstanceState) {
     text3 = findViewById(R.id.text3);
     text4 = findViewById(R.id.text4);
 
-    String t1,t2,t3,t4,uri,userEmail;
+    String t1,t2,t3,t4,uri;
 
     Intent intent = getIntent();
 
@@ -208,7 +213,7 @@ protected void onCreate(Bundle savedInstanceState) {
 
                 int intConf = (int) (conf * 100);
 
-                Imgproc.putText(image1,  intConf + "%", box.tl(), Core.FONT_HERSHEY_SIMPLEX, 2, new Scalar(0, 255, 0), 3);
+                Imgproc.putText(image1,"No."+ (i+1), box.tl(), Core.FONT_HERSHEY_SIMPLEX, 2, new Scalar(0, 0, 255), 3);
                 Imgproc.rectangle(image1, box.tl(), box.br(), new Scalar(255, 0, 0), 5);
 
             }
@@ -270,13 +275,13 @@ protected void onCreate(Bundle savedInstanceState) {
             }).setNegativeButton("취소",null);
             dialog.create();
             dialog.show();
-
-
-
         }
     });
-
 }
 
-
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
 }

@@ -33,7 +33,7 @@ public class HomeAdapter extends RecyclerView.Adapter<HomeItemView> {
         View view;
         //MovieCase의 TOP, DOWN을 가져옴.
         if(sel_type == MovieCase.TOP){
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.multi_image_item, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.top_multi_image_item, parent, false);
             return new ViewHolderMovieTop(view);
         } else if(sel_type == MovieCase.DOWN){
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.down_multi_image_item, parent, false);

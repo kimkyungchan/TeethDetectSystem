@@ -15,10 +15,19 @@
                 android:id="@+id/pictureGet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/black"
+                android:background="#114067"
                 android:layout_weight="0.1"
                 android:textColor="@color/white"
                 android:text="치아사진으로 충치 검진" />
+        <Button
+            android:id="@+id/VideoGet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:background="#114067"
+            android:layout_weight="0.1"
+            android:textColor="@color/white"
+            android:text="실시간 충치 검진" />
 
             <TextView
                 android:layout_width="match_parent"
