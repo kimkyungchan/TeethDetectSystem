@@ -56,13 +56,13 @@ public class HomeFragment extends Fragment {
         adapter2 = new HomeAdapter(MovieCase.DOWN);
         home_RecyclerView2.setAdapter(adapter2);
 
-        Home_ItemData data2 = new Home_ItemData(R.drawable.ex3, "-올바른 형식-", "치아 전체가 보이게 찍어주세요.");
+        Home_ItemData data2 = new Home_ItemData(R.drawable.guide1, "-올바른 형식-", "치아 전체가 보이게 찍어주세요.");
         adapter2.addItem(data2);
-        data2 = new Home_ItemData(R.drawable.caries3, "-올바른 형식-","충치 의심부분을 가까이 찍어주세요.");
+        data2 = new Home_ItemData(R.drawable.guide3, "-올바른 형식-","충치 의심부분을 가까이 찍어주세요.");
         adapter2.addItem(data2);
-        data2 = new Home_ItemData(R.drawable.caries2, "-올바르지 않은 형식-","빛 반사광이 심한 \n치아사진.");
+        data2 = new Home_ItemData(R.drawable.guide2, "-올바르지 않은 형식-","음식물이 끼어있는\n 치아사진.");
         adapter2.addItem(data2);
-        data2 = new Home_ItemData(R.drawable.careis4, "-올바르지 않은 형식-","어두워서 치아가\n 보이지 않는 사진.");
+        data2 = new Home_ItemData(R.drawable.guide4, "-올바르지 않은 형식-","어두워서 치아가\n 보이지 않는 사진.");
         adapter2.addItem(data2);
 
         return v;

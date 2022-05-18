@@ -358,8 +358,8 @@ public String getCurrentAddress(LatLng latlng) {
 
 
     if (addresses == null || addresses.size() == 0) {
-        Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
-        return "주소 미발견";
+        //Toast.makeText(this, "주소 미발견", Toast.LENGTH_LONG).show();
+        return null;
 
     } else {
         Address address = addresses.get(0);
@@ -574,7 +574,7 @@ protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         new NRPlaces.Builder()
                 .listener(MapsActivity.this)
-                .key("AIzaSyC3x0zqZbCH6DmEXjq7OjH-LscV1RvDgow")
+                .key("AIzaSyAlj3LcEywEsTh9JN82JGbjWcnnbCzoFT8")
                 .latlng(location.latitude, location.longitude)//현재 위치
                 .radius(x) //사용자가 선택한 거리
                 .type(PlaceType.DENTIST) //치과

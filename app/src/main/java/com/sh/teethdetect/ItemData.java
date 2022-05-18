@@ -6,16 +6,14 @@ public class ItemData {
     String currenttime; // 검진시각
 Bitmap dataimage;// 충치사진
 String datainfo; // 충치인덱스
-String visittext; // 병원방문텍스
 String detect;
 String uri;
 
-public ItemData(String uri,String currenttime, Bitmap dataimage, String datainfo, String visittext, String detect) {
+public ItemData(String uri,String currenttime, Bitmap dataimage, String datainfo, String detect) {
     this.uri=uri;
     this.currenttime = currenttime;
     this.dataimage = dataimage;
     this.datainfo = datainfo;
-    this.visittext = visittext;
     this.detect = detect;
 
 }
@@ -52,13 +50,6 @@ public void setDatainfo(String datainfo) {
 }
 
 
-public String getDatapercent() {
-    return visittext;
-}
-
-public void setDatapercent(String visittext) {
-    this.visittext = visittext;
-}
 
 public String getDetect(){
     return detect;

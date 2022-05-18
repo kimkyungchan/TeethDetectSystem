@@ -46,7 +46,7 @@ import java.util.List;
 public class ListClickView extends AppCompatActivity {
     ImageView uriimage;
     Button delete;
-    TextView text1,text2,text3,text4;
+    TextView text1,text2,text3; //text4
     BaseLoaderCallback baseLoaderCallback;
     boolean startYolo = false;
     boolean firstTimeYolo = false;
@@ -101,7 +101,7 @@ protected void onCreate(Bundle savedInstanceState) {
     text1 = findViewById(R.id.text1);
     text2 = findViewById(R.id.text2);
     text3 = findViewById(R.id.text3);
-    text4 = findViewById(R.id.text4);
+    //text4 = findViewById(R.id.text4);
 
     String t1,t2,t3,t4,uri;
 
@@ -231,7 +231,7 @@ protected void onCreate(Bundle savedInstanceState) {
     text1.setText("검진시각\n"+t1);
     text2.setText("충치개수:"+t2);
     text3.setText("충치인덱스\n"+t3);
-    text4.setText("권고사항\n"+t4);
+    //text4.setText("권고사항\n"+t4);
 
 
     delete.setOnClickListener(new View.OnClickListener() {
@@ -239,7 +239,7 @@ protected void onCreate(Bundle savedInstanceState) {
         public void onClick(View view) {
 
             AlertDialog.Builder dialog = new AlertDialog.Builder(ListClickView.this);
-            dialog.setTitle("삭제하시겠습니까?").setPositiveButton("확인", new DialogInterface.OnClickListener() {
+            dialog.setTitle("삭제하시겠습니까?\n삭제시 데이터 복구가 불가능합니다.").setPositiveButton("확인", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     Response.Listener<String> responseListener = new Response.Listener<String>() {

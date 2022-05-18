@@ -18,7 +18,8 @@
             android:layout_width="match_parent"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:src="@drawable/nox" />
+            android:scaleType="fitXY"
+            android:src="@drawable/clicklistview" />
     </LinearLayout>
 
     <LinearLayout
@@ -34,6 +35,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textStyle="bold"
             android:layout_weight="1" />
 
         <TextView
@@ -43,6 +46,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textStyle="bold"
             android:layout_weight="1" />
 
         <TextView
@@ -52,33 +57,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textColor="@color/black"
+            android:textSize="20dp"
+            android:textStyle="bold"
             android:layout_weight="1" />
 
-        <TextView
-            android:id="@+id/text4"
-            android:gravity="center"
-            android:layout_gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:textColor="@color/black"
-            android:layout_weight="1" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_weight="1">
         <Button
             android:enabled="true"
             android:id="@+id/delete"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_height="50dp"
             android:background="#114067"
             android:textColor="@color/white"
             android:textSize="15dp"
             android:text="검진보고서 삭제"/>
 
-        </LinearLayout>
     </LinearLayout>
 </LinearLayout>

@@ -65,7 +65,6 @@ public class HomeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String userEmail = intent.getStringExtra("userEmail");
-        String UE = intent.getStringExtra("UE");
 
         baseLoaderCallback = new BaseLoaderCallback(this) {
             @Override

@@ -6,13 +6,13 @@
         android:id="@+id/item_fragment1"
         android:enabled="true"
         android:icon="@drawable/teeth_detect"
-        android:title="사진검진"/>
+        android:title="충치검진"/>
 
     <item
         android:id="@+id/item_fragment2"
         android:enabled="true"
         android:icon="@drawable/teeth_camera"
-        android:title="실시간검진"/>
+        android:title="치아촬영"/>
 
     <item
         android:id="@+id/item_fragment5"

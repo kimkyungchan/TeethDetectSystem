@@ -45,7 +45,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     TextView datatime;
     ImageView dataimage;
     TextView datainfo;
-    TextView datadetect;
+    //TextView datadetect;
     TextView detect;
 
 
@@ -66,7 +66,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         datatime = itemView.findViewById(R.id.teethtime);
         dataimage = itemView.findViewById(R.id.teethimageview);
         datainfo = itemView.findViewById(R.id.teethInfoText);
-        datadetect= itemView.findViewById(R.id.teethDetectText);
+        //datadetect= itemView.findViewById(R.id.teethDetectText);
         detect = itemView.findViewById(R.id.teethDetect2);
 
     }
@@ -93,7 +93,7 @@ public void onBindViewHolder(MultiImageAdapter.ViewHolder holder, int position) 
     holder.datatime.setText("검진시각:"+item.getCurrentTime());
     holder.dataimage.setImageBitmap(item.getDataImage());
     holder.datainfo.setText("충치개수 : "+item.getDatainfo());
-    holder.datadetect.setText(item.getDatapercent());
+    //holder.datadetect.setText(item.getDatapercent());
     holder.detect.setText(item.getDetect());
 }
 

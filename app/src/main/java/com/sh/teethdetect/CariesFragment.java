@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -48,6 +49,7 @@ import org.opencv.dnn.Dnn;
 import org.opencv.dnn.Net;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.utils.Converters;
+import org.w3c.dom.Text;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -84,6 +86,7 @@ public class CariesFragment extends Fragment {
 
     private ImageView imageView2;
     private Button pictureGet,Dialogbtn,videoget;
+    private TextView DialogText;
 
 
     @Override
@@ -99,8 +102,7 @@ public class CariesFragment extends Fragment {
         videoget.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), VideodetectActivity.class);
-                startActivity(intent);
+                ShowDialog3();
             }
         });
 
@@ -230,7 +232,7 @@ public class CariesFragment extends Fragment {
                 String data = itemData.getCurrentTime(); //날짜
                 String num = itemData.getDatainfo(); // 충치개수
                 String index = itemData.getDetect(); // 충치인덱스별 퍼센트
-                String visit = itemData.getDatapercent(); // 방문텍스트
+                //String visit = itemData.getDatapercent(); // 방문텍스트
 
 
                 Intent intent = new Intent(getActivity(), ListClickView.class);
@@ -239,7 +241,7 @@ public class CariesFragment extends Fragment {
                 intent.putExtra("Date", data);
                 intent.putExtra("Num",num);
                 intent.putExtra("Index",index);
-                intent.putExtra("Visit",visit);
+                //intent.putExtra("Visit",visit);
                 intent.putExtra("UserEmail",userEmail);
                 startActivity(intent);
                 //getActivity().finish(); //돌아와도 프래그먼트 살아있게 하기위해 주석처리
@@ -283,7 +285,7 @@ public class CariesFragment extends Fragment {
                        // String ImageUritoString = BitmapToString(bitmap);
 
                         AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                        dialog.setTitle("이전 검진결과를 불러오는 중 입니다.\n");
+                        dialog.setTitle("검진결과를 불러오는 중 입니다.\n");
                         dialog.create();
                         dialog.show();
 
@@ -446,7 +448,7 @@ private String getRealPathFromURI(Uri contentUri) {
 
         private void getOpenCv(Bitmap bitmap,String CurrentTime,String Uri){
             Toast.makeText(getActivity().getApplicationContext(),"과거 검진 리스트를 불러오는 중입니다(10초가량소요) 과거 검진이력이 없으면 불러오지않습니다.",Toast.LENGTH_SHORT).show();
-            String visittext = "검진결과 충치확률이 50% 이상입니다. 치과방문을 권장합니다. ";
+            String visittext = "　";
             String visittext2= "충치 확률이 절반 이하이지만, 정확한 검진을 위해 치과 방문을 권장합니다.";
             String visittext3= "인공지능이 충치를 발견하지 못하였습니다.(정상치아)";
 
@@ -570,18 +572,18 @@ private String getRealPathFromURI(Uri contentUri) {
 
             cariesnumber = String.valueOf(indlength);
             if(indlength > 0 && max >= 50){
-                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,visittext,detect1));
+                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,detect1));
                 Log.e("씨발",detect1);
                 indlength = 0;
                 max = 0;
 
             } else if(indlength > 0 && max < 50 && max > 0){
-                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,visittext2,detect1));
+                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,detect1));
                 Log.e("씨발",detect1);
                 indlength = 0;
                 max = 0;
             } else if(indlength <= 0){
-                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,visittext3,"　"));
+                datalist.add(new ItemData(Uri,CurrentTime,setimg,cariesnumber,"　"));
                 indlength=0;
             }
 
@@ -637,6 +639,24 @@ public void ShowDialog2(){
         }
     });
 }
+
+    public void ShowDialog3(){
+        dialog1 = new Dialog(getActivity());
+        dialog1.setContentView(R.layout.cariesdialog);
+        dialog1.show();
+
+        Dialogbtn = dialog1.findViewById(R.id.CariesDialogButton);
+        DialogText = dialog1.findViewById(R.id.CariesDialogText);
+        DialogText.setText("확인버튼을 누르면 실시간 충치검진이 시작됩니다.\n사양에 따라 앱이 멈추거나 느려질수 있습니다.");
+        Dialogbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(),VideodetectActivity.class);
+                startActivity(intent);
+                dialog1.dismiss();
+            }
+        });
+    }
 
 
 }
