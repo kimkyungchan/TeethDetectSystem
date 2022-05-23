@@ -33,22 +33,20 @@
             android:gravity="center"
             android:layout_gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="70dp"
             android:textColor="@color/black"
             android:textSize="20dp"
-            android:textStyle="bold"
-            android:layout_weight="1" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/text2"
             android:gravity="center"
             android:layout_gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="70dp"
             android:textColor="@color/black"
             android:textSize="20dp"
-            android:textStyle="bold"
-            android:layout_weight="1" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/text3"

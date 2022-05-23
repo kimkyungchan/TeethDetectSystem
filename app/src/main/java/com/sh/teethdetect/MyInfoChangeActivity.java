@@ -2,6 +2,8 @@ package com.sh.teethdetect;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,7 +47,10 @@ protected void onCreate(Bundle savedInstanceState) {
             String passcheck = mypage_passcheck.getText().toString();
 
             //바꿀비밀번호가 일치할때
-            if(pass.equals(passcheck)){
+            if (pass.length()==0 || passcheck.length()==0){
+                Toast.makeText(getApplicationContext(),"공백은 비밀번호 X",Toast.LENGTH_SHORT).show();
+            }
+            else if(pass.equals(passcheck)){
 
                 //db에 있는 값을 받아옴
                 Response.Listener<String> responseListener = new Response.Listener<String>() {
@@ -75,12 +80,11 @@ protected void onCreate(Bundle savedInstanceState) {
                 RequestQueue queue = Volley.newRequestQueue( MyInfoChangeActivity.this );
                 queue.add( myInfoChangeRequest );
 
+                Log.e("이게 왜돼냐??", String.valueOf(pass.equals(passcheck)));
             }
-
             else{
                 Toast.makeText(getApplicationContext(),"비밀번호가 일치하지 않습니다",Toast.LENGTH_SHORT).show();
             }
-
         }
     });
 

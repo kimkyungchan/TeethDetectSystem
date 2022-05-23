@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.SurfaceView;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -42,10 +43,17 @@ Net tinyYolo;
 @Override
 protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
     setContentView(R.layout.activity_videodetect);
     cameraBridgeViewBase = (JavaCameraView) findViewById(R.id.CameraView);
     cameraBridgeViewBase.setVisibility(SurfaceView.VISIBLE);
     cameraBridgeViewBase.setCvCameraViewListener(this);
+
 
     if (startYolo == false) {
 
